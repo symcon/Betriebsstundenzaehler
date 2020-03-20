@@ -1,0 +1,12 @@
+{
+    "id": "{45E8127A-C5C4-56A5-A652-9A74B4D5071E}",
+    "author": "Symcon GmbH",
+    "name": "Betriebsstundenzaehler",
+    "url": "https://symcon.de/",
+    "compatibility": {
+        "version": "5.2"
+    },
+    "version": "1.0",
+    "build": 0,
+    "date": 0
+}

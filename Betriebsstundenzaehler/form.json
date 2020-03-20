@@ -1,0 +1,22 @@
+{
+    "elements": [
+        {
+            "type": "SelectVariable", "name": "Source", "caption": "Source"
+        },
+        {
+            "type": "Select", "name": "Level", "caption": "Level", "options": [
+                {"caption": "Day", "value": 1},
+                {"caption": "Week", "value": 2},
+                {"caption": "Month", "value": 3},
+                {"caption": "Year", "value": 4},
+                {"caption": "Complete", "value": 5}
+            ]
+        },
+        {
+            "type": "NumberSpinner", "name": "Interval", "caption": "Update Interval", "minimum": 0, "suffix": "Minutes"
+        }
+    ],
+    "status": [
+        {"code": 104, "caption": "Selected variable must be logged and of type boolean.", "icon": "error"}
+    ]
+}

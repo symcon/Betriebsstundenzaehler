@@ -1,0 +1,12 @@
+{
+    "id": "{37569A16-8496-EF9B-A322-FC972D605D90}",
+    "name": "Betriebsstundenzaehler",
+    "type": 3,
+    "vendor": "",
+    "aliases": [],
+    "parentRequirements": [],
+    "childRequirements": [],
+    "implemented": [],
+    "prefix": "BSZ",
+    "url": "https://symcon.de"
+}

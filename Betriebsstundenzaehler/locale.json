@@ -1,0 +1,17 @@
+{
+    "translations": {
+        "de": {
+            "Selected variable must be logged and of type boolean.": "Ausgewählte Variable muss geloggt und vom Typ Boolean sein.",
+            "Source": "Quelle",
+            "Level": "Stufe",
+            "Day": "Tag",
+            "Week": "Woche",
+            "Month": "Monat",
+            "Year": "Jahr",
+            "Complete": "Gesamt",
+            "Update Interval": "Aktualisierungsintervall",
+            "Minutes": "Minuten",
+            "Hours of Operation": "Betriebsstunden"
+        }
+    }
+}
