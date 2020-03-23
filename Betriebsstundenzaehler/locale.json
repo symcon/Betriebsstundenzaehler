@@ -11,7 +11,8 @@
             "Complete": "Gesamt",
             "Update Interval": "Aktualisierungsintervall",
             "Minutes": "Minuten",
-            "Hours of Operation": "Betriebsstunden"
+            "Hours of Operation": "Betriebsstunden",
+            " Hours": " Stunden"
         }
     }
 }
