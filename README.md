@@ -1,6 +1,6 @@
-# Betriebsstundenaehler
+# Betriebsstundenzähler
 
-Folgende Module beinhaltet das Betriebsstundenaehler Repository:
+Folgende Module beinhaltet das Betriebsstundenzähler Repository:
 
-- __Betriebsstundenzaehler__ ([Dokumentation](Betriebsstundenzaehler))
+- __Betriebsstundenzähler__ ([Dokumentation](Betriebsstundenzähler))
 	Kurze Beschreibung des Moduls.

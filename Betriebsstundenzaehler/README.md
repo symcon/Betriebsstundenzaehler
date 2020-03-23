@@ -1,4 +1,4 @@
-# Betriebsstundenzaehler
+# Betriebsstundenzähler
 Beschreibung des Moduls.
 
 ### Inhaltsverzeichnis
@@ -21,12 +21,12 @@ Beschreibung des Moduls.
 
 ### 3. Software-Installation
 
-* Über den Module Store das 'Betriebsstundenzaehler'-Modul installieren.
+* Über den Module Store das 'Betriebsstundenzähler'-Modul installieren.
 * Alternativ über das Module Control folgende URL hinzufügen
 
 ### 4. Einrichten der Instanzen in IP-Symcon
 
- Unter 'Instanz hinzufügen' ist das 'Betriebsstundenzaehler'-Modul unter dem Hersteller '(Gerät)' aufgeführt.
+ Unter 'Instanz hinzufügen' ist das 'Betriebsstundenzähler'-Modul unter dem Hersteller '(Gerät)' aufgeführt.
 
 __Konfigurationsseite__:
 
