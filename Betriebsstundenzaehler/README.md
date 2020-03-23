@@ -13,7 +13,8 @@ Beschreibung des Moduls.
 
 ### 1. Funktionsumfang
 
-*
+* Anzeige der Stunden, welche ein Gerät aktiv ist.
+* Hinzufügen des Geräts furch eine Boolsche-Variable.
 
 ### 2. Vorraussetzungen
 
@@ -22,7 +23,7 @@ Beschreibung des Moduls.
 ### 3. Software-Installation
 
 * Über den Module Store das 'Betriebsstundenzähler'-Modul installieren.
-* Alternativ über das Module Control folgende URL hinzufügen
+* Alternativ über das Module Control folgende URL hinzufügen.
 
 ### 4. Einrichten der Instanzen in IP-Symcon
 
@@ -30,10 +31,11 @@ Beschreibung des Moduls.
 
 __Konfigurationsseite__:
 
-Name     | Beschreibung
--------- | ------------------
-         |
-         |
+Name                     | Beschreibung
+------------------------ | ------------------
+Quelle                   | Die Variable, deren Betriebszeit angezeigt werden soll.
+Stufe                    | Die Länge des Zeitraumes, welcher beobachtet wird (Tag , Woche, Monat, Jahr, Gesamt).
+Aktualisierungsintervall | Der Intervall in dem der Wert aktualisiert wird.
 
 ### 5. Statusvariablen und Profile
 
@@ -41,26 +43,25 @@ Die Statusvariablen/Kategorien werden automatisch angelegt. Das Löschen einzeln
 
 #### Statusvariablen
 
-Name   | Typ     | Beschreibung
------- | ------- | ------------
-       |         |
-       |         |
+Name            | Typ   | Beschreibung
+--------------- | ----- | ------------
+Betriebsstunden | float | Die Anzahl der Stunden, welche die Quellvariable aktiv war.
 
 #### Profile
 
-Name   | Typ
------- | -------
-       |
-       |
+Name              | Typ
+----------------- | -------
+BSZ.OperatingHours| float
 
 ### 6. WebFront
 
-Die Funktionalität, die das Modul im WebFront bietet.
+Im Webfront werden die Betriebsstunden angezeigt.
 
 ### 7. PHP-Befehlsreferenz
 
-`boolean BSZ_BeispielFunktion(integer $InstanzID);`
-Erklärung der Funktion.
+`void BSZ_Calculate(integer $InstanzID);`
+
+Die Betriebsstunden-Variable wird auf den errechneten Wert gesetzt.
 
 Beispiel:
-`BSZ_BeispielFunktion(12345);`
+`BSZ_Calculate(12345);`
