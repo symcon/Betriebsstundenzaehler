@@ -16,7 +16,7 @@ class Betriebsstundenzaehler extends IPSModule
         //VariableProfiles
         if (!IPS_VariableProfileExists('BSZ.OperatingHours')) {
             IPS_CreateVariableProfile('BSZ.OperatingHours', 2);
-            IPS_SetVariableProfileText('BSZ.OperatingHours', '', $this->Translate(' Hours'));
+            IPS_SetVariableProfileText('BSZ.OperatingHours', '', $this->Translate(' hours'));
         }
 
         //Variables
