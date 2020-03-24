@@ -3,7 +3,9 @@
     "name": "Betriebsstundenzaehler",
     "type": 3,
     "vendor": "",
-    "aliases": [],
+    "aliases": [
+        "Betriebsstundenzähler"
+    ],
     "parentRequirements": [],
     "childRequirements": [],
     "implemented": [],
