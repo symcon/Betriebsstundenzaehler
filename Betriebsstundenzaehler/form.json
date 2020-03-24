@@ -13,7 +13,7 @@
             ]
         },
         {
-            "type": "NumberSpinner", "name": "Interval", "caption": "Update Interval", "minimum": 0, "suffix": "Minutes"
+            "type": "NumberSpinner", "name": "Interval", "caption": "Update Interval", "minimum": 1, "suffix": "Minutes"
         }
     ],
     "status": [
