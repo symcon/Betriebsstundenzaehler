@@ -57,7 +57,7 @@ class Betriebsstundenzaehler extends IPSModule
     {
         //Add options to form
         $form = json_decode(file_get_contents(__DIR__ . '/form.json'), true);
-        $form['status'][0]['caption'] = $this->CheckVariable(); 
+        $form['status'][0]['caption'] = $this->CheckVariable();
         return json_encode($form);
     }
 
