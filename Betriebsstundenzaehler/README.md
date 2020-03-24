@@ -1,5 +1,5 @@
 # Betriebsstundenzähler
-Beschreibung des Moduls.
+Mithilfe des Betriebsstundenzähler-Modul kann die Betriebszeit eines Gerätes ermittelt und angezeigt werden.
 
 ### Inhaltsverzeichnis
 
@@ -13,8 +13,8 @@ Beschreibung des Moduls.
 
 ### 1. Funktionsumfang
 
-* Anzeige der Stunden, welche ein Gerät aktiv ist.
-* Hinzufügen des Geräts furch eine Boolsche-Variable.
+* Anzeige der Stunden, welche ein Gerät aktiv ist
+* Hinzufügen des Geräts durch eine Variable vom Typ Boolean
 
 ### 2. Vorraussetzungen
 
@@ -23,7 +23,7 @@ Beschreibung des Moduls.
 ### 3. Software-Installation
 
 * Über den Module Store das 'Betriebsstundenzähler'-Modul installieren.
-* Alternativ über das Module Control folgende URL hinzufügen.
+* Alternativ über das Module Control folgende URL hinzufügen: `https://github.com/symcon/Betriebsstundenzaehler`
 
 ### 4. Einrichten der Instanzen in IP-Symcon
 
@@ -33,9 +33,9 @@ __Konfigurationsseite__:
 
 Name                     | Beschreibung
 ------------------------ | ------------------
-Quelle                   | Die Variable, deren Betriebszeit angezeigt werden soll.
-Stufe                    | Die Länge des Zeitraumes, welcher beobachtet wird (Tag , Woche, Monat, Jahr, Gesamt).
-Aktualisierungsintervall | Der Intervall in dem der Wert aktualisiert wird.
+Quelle                   | Die Variable vom Typ Boolean, deren Betriebszeit angezeigt werden soll.
+Stufe                    | Die Umfang des Zeitraumes bis zum aktuellen Zeitpunkt, welcher beobachtet wird (Tag , Woche, Monat, Jahr, Gesamt).
+Aktualisierungsintervall | Der Intervall in Minuten in dem der Wert aktualisiert wird.
 
 ### 5. Statusvariablen und Profile
 
@@ -45,7 +45,7 @@ Die Statusvariablen/Kategorien werden automatisch angelegt. Das Löschen einzeln
 
 Name            | Typ   | Beschreibung
 --------------- | ----- | ------------
-Betriebsstunden | float | Die Anzahl der Stunden, welche die Quellvariable aktiv war.
+Betriebsstunden | float | Die Betriebsstunden im gewählten Intervall in Abhängigkeit der eingestellten Stufe.
 
 #### Profile
 
