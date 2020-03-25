@@ -1,5 +1,5 @@
 # Betriebsstundenzähler
-Mithilfe des Betriebsstundenzähler-Modul kann die Betriebszeit eines Gerätes ermittelt und angezeigt werden.
+Mithilfe des Betriebsstundenzähler-Moduls kann die Betriebszeit eines Gerätes ermittelt und angezeigt werden.
 
 ### Inhaltsverzeichnis
 
@@ -34,8 +34,9 @@ __Konfigurationsseite__:
 Name                     | Beschreibung
 ------------------------ | ------------------
 Quelle                   | Die Variable vom Typ Boolean, deren Betriebszeit angezeigt werden soll.
-Stufe                    | Die Umfang des Zeitraumes bis zum aktuellen Zeitpunkt, welcher beobachtet wird (Tag , Woche, Monat, Jahr, Gesamt).
-Aktualisierungsintervall | Der Intervall in Minuten in dem der Wert aktualisiert wird.
+Die Variable vom Typ Boolean, welche den Aktivitätsstatus eines Gerätes anzeigt. Um die Betriebsstunden zu errechnen muss diese Variable geloggt sein.  
+Stufe                    | Die Stufe legt den Beginn des Zeitraums fest welcher betrachtet wird. (Beginn des Tages, Woche, Monat, Jahr)
+Aktualisierungsintervall | Der Intervall in Minuten in dem die Betriebszeit erneut berechnet wird Betriebszeit wird.
 
 ### 5. Statusvariablen und Profile
 
@@ -45,7 +46,7 @@ Die Statusvariablen/Kategorien werden automatisch angelegt. Das Löschen einzeln
 
 Name            | Typ   | Beschreibung
 --------------- | ----- | ------------
-Betriebsstunden | float | Die Betriebsstunden im gewählten Intervall in Abhängigkeit der eingestellten Stufe.
+Betriebsstunden | float | Die berechneten Betriebsstunden der Quellvariable im ausgewählten Zeitraum.
 
 #### Profile
 
