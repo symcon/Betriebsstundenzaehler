@@ -38,27 +38,21 @@ class Betriebsstundenzaehler extends IPSModule
         parent::ApplyChanges();
         $source = $this->ReadPropertyInteger('Source');
         $archiveID = IPS_GetInstanceListByModuleID('{43192F0B-135B-4CE7-A0A7-1475603F3060}')[0];
-
-        if (IPS_VariableExists($source) && AC_GetLoggingStatus($archiveID, $source) && (IPS_GetVariable($source)['VariableType'] == 0)) {
+        if ($source == 0) {
+            $this->SetErrorState(104);
+        } elseif (!IPS_VariableExists($source)) {
+            $this->SetErrorState(200);
+        } elseif (!AC_GetLoggingStatus($archiveID, $source) || (IPS_GetVariable($source)['VariableType'] != 0)) {
+            $this->SetErrorState(201);
+        } else {
             $this->SetStatus(102);
             if ($this->GetTimerInterval('UpdateCalculationTimer') > ($this->ReadPropertyInteger('Interval') * 1000 * 60)) {
                 $this->SetTimerInterval('UpdateCalculationTimer', $this->ReadPropertyInteger('Interval') * 1000 * 60);
             }
-        } else {
-            $this->SetStatus(104);
-            $this->SetTimerInterval('UpdateCalculationTimer', 0);
         }
         $this->Calculate();
         $this->SendDebug('TimerInterval', $this->GetTimerInterval('UpdateCalculationTimer'), 0);
         $this->GetTimerInterval('UpdateCalculationTimer');
-    }
-
-    public function GetConfigurationForm()
-    {
-        //Add options to form
-        $form = json_decode(file_get_contents(__DIR__ . '/form.json'), true);
-        $form['status'][0]['caption'] = $this->CheckVariable();
-        return json_encode($form);
     }
 
     public function Calculate()
@@ -99,16 +93,10 @@ class Betriebsstundenzaehler extends IPSModule
         }
     }
 
-    private function CheckVariable()
+    private function SetErrorState($status)
     {
-        $source = $this->ReadPropertyInteger('Source');
-        $archiveID = IPS_GetInstanceListByModuleID('{43192F0B-135B-4CE7-A0A7-1475603F3060}');
-        if ($source == 0) {
-            return $this->Translate('No variable selected.');
-        } elseif (!IPS_VariableExists($source)) {
-            return $this->Translate('Selcted variable does not exist.');
-        } else {
-            return $this->Translate('Selected variable must be logged and of type boolean.');
-        }
+        $this->SetStatus($status);
+        $this->SetTimerInterval('UpdateCalculationTimer', 0);
+        $this->SetValue('OperatingHours', 0);
     }
 }
