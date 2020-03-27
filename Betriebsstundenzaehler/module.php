@@ -19,6 +19,7 @@ class Betriebsstundenzaehler extends IPSModule
         $this->RegisterPropertyInteger('Source', 0);
         $this->RegisterPropertyInteger('Level', 1);
         $this->RegisterPropertyInteger('Interval', 0);
+        $this->RegisterPropertyBoolean('Active', false);
 
         //VariableProfiles
         if (!IPS_VariableProfileExists('BSZ.OperatingHours')) {
@@ -53,8 +54,10 @@ class Betriebsstundenzaehler extends IPSModule
             $this->SetErrorState(201);
         } else {
             $this->SetStatus(102);
-            if ($this->GetTimerInterval('UpdateCalculationTimer') > ($this->ReadPropertyInteger('Interval') * 1000 * 60)) {
+            if ($this->ReadPropertyBoolean('Active') && $this->GetTimerInterval('UpdateCalculationTimer') > ($this->ReadPropertyInteger('Interval') * 1000 * 60)) {
                 $this->SetTimerInterval('UpdateCalculationTimer', $this->ReadPropertyInteger('Interval') * 1000 * 60);
+            } elseif (!$this->ReadPropertyBoolean('Active')) {
+                $this->SetTimerInterval('UpdateCalculationTimer', 0);
             }
         }
         $this->Calculate();

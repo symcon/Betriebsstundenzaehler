@@ -14,7 +14,9 @@
             "Update Interval": "Aktualisierungsintervall",
             "Minutes": "Minuten",
             "Hours of Operation": "Betriebsstunden",
-            " hours": " Stunden"
+            " hours": " Stunden",
+            "Active": "Aktiv",
+            "Calculate": "Berechnen"
         }
     }
 }
