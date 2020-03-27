@@ -1,6 +1,13 @@
 <?php
 
 declare(strict_types=1);
+
+define('LVL_DAY', 1);
+define('LVL_WEEK', 2);
+define('LVL_MONTH', 3);
+define('LVL_YEAR', 4);
+define('LVL_COMPLETE', 5);
+
 class Betriebsstundenzaehler extends IPSModule
 {
     public function Create()
@@ -51,8 +58,6 @@ class Betriebsstundenzaehler extends IPSModule
             }
         }
         $this->Calculate();
-        $this->SendDebug('TimerInterval', $this->GetTimerInterval('UpdateCalculationTimer'), 0);
-        $this->GetTimerInterval('UpdateCalculationTimer');
     }
 
     public function Calculate()
@@ -61,19 +66,19 @@ class Betriebsstundenzaehler extends IPSModule
             $archiveID = IPS_GetInstanceListByModuleID('{43192F0B-135B-4CE7-A0A7-1475603F3060}')[0];
             $aggregationLevel = $this->ReadPropertyInteger('Level');
             switch ($aggregationLevel) {
-                case 1:
+                case LVL_DAY:
                     $startTime = strtotime('today 00:00:00', time());
                     break;
-                case 2:
+                case LVL_WEEK:
                     $startTime = strtotime('last monday 00:00:00', time());
                     break;
-                case 3:
+                case LVL_MONTH:
                     $startTime = strtotime('first day of this month 00:00:00', time());
                     break;
-                case 4:
+                case LVL_YEAR:
                     $startTime = strtotime('1st january 00:00:00', time());
                     break;
-                case 5:
+                case LVL_COMPLETE:
                     $startTime = 0;
                     $aggregationLevel = 4;
                     break;
@@ -82,13 +87,10 @@ class Betriebsstundenzaehler extends IPSModule
             }
             $values = AC_GetAggregatedValues($archiveID, $this->ReadPropertyInteger('Source'), $aggregationLevel, $startTime, time(), 0);
             $this->SendDebug('AggregatedValues', json_encode($values), 0);
-            $average = 0;
-            $duration = 0;
+            $seconds = 0;
             foreach ($values as $value) {
-                $average += $value['Avg'];
-                $duration += $value['Duration'];
+                $seconds += $value['Avg'] * $value['Duration'];
             }
-            $seconds = $duration * $average;
             $this->SetValue('OperatingHours', ($seconds / (60 * 60)));
         }
     }
