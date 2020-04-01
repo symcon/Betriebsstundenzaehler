@@ -78,7 +78,6 @@ class Betriebsstundenzaehler extends IPSModule
 
     public function Calculate()
     {
-
         $source = $this->ReadPropertyInteger('Source');
         $archiveID = IPS_GetInstanceListByModuleID('{43192F0B-135B-4CE7-A0A7-1475603F3060}')[0];
         $errorState = 0;
@@ -89,7 +88,7 @@ class Betriebsstundenzaehler extends IPSModule
         } elseif (!AC_GetLoggingStatus($archiveID, $source) || (IPS_GetVariable($source)['VariableType'] != 0)) {
             $errorState = 201;
         }
-        
+
         if ($errorState != 0) {
             $statuscodes = [];
             $statusForm = json_decode(IPS_GetConfigurationForm($this->InstanceID), true)['status'];
