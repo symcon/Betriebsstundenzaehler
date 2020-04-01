@@ -17,7 +17,7 @@ class Betriebsstundenzaehler extends IPSModule
 
         //Properties
         $this->RegisterPropertyInteger('Source', 0);
-        $this->RegisterPropertyInteger('Level', 1);
+        $this->RegisterPropertyInteger('Level', LVL_DAY);
         $this->RegisterPropertyInteger('Interval', 30);
         $this->RegisterPropertyBoolean('Active', false);
 
