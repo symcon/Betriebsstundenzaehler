@@ -44,7 +44,29 @@ class Betriebsstundenzaehler extends IPSModule
     {
         //Never delete this line!
         parent::ApplyChanges();
-        if ($this->CheckSourceVariable() == 102) {
+        $currentStatus = 104;
+
+        $source = $this->ReadPropertyInteger('Source');
+        $archiveID = IPS_GetInstanceListByModuleID('{43192F0B-135B-4CE7-A0A7-1475603F3060}')[0];
+        if (!$this->ReadPropertyBoolean('Active')) {
+            $this->SetErrorState(104);
+            $currentStatus = 104;
+        } elseif ($source == 0) {
+            $this->SetErrorState(202);
+            $currentStatus = 202;
+        } elseif (!IPS_VariableExists($source)) {
+            $this->SetErrorState(200);
+            $currentStatus = 200;
+        } elseif (!AC_GetLoggingStatus($archiveID, $source) || (IPS_GetVariable($source)['VariableType'] != 0)) {
+            $this->SetErrorState(201);
+            $currentStatus = 201;
+        }
+        if ($this->ReadPropertyBoolean('Active')) {
+            $this->SetStatus(102);
+            $currentStatus = 102;
+        }
+
+        if ($currentStatus == 102) {
             if ($this->ReadPropertyBoolean('Active') && $this->GetTimerInterval('UpdateCalculationTimer') < ($this->ReadPropertyInteger('Interval') * 1000 * 60)) {
                 $this->SetTimerInterval('UpdateCalculationTimer', $this->ReadPropertyInteger('Interval') * 1000 * 60);
             } elseif (!$this->ReadPropertyBoolean('Active')) {
@@ -56,13 +78,28 @@ class Betriebsstundenzaehler extends IPSModule
 
     public function Calculate()
     {
-        if ($this->GetSourceStatus() != 0) {
-            $this->SendDebug('Error', $this->evaluateStatus($this->GetSourceStatus()), 0);
-            echo $this->Translate($this->evaluateStatus($this->GetSourceStatus()));
+
+        $source = $this->ReadPropertyInteger('Source');
+        $archiveID = IPS_GetInstanceListByModuleID('{43192F0B-135B-4CE7-A0A7-1475603F3060}')[0];
+        $errorState = 0;
+        if ($source == 0) {
+            $errorState = 202;
+        } elseif (!IPS_VariableExists($source)) {
+            $errorState = 200;
+        } elseif (!AC_GetLoggingStatus($archiveID, $source) || (IPS_GetVariable($source)['VariableType'] != 0)) {
+            $errorState = 201;
+        }
+        
+        if ($errorState != 0) {
+            $statuscodes = [];
+            $statusForm = json_decode(IPS_GetConfigurationForm($this->InstanceID), true)['status'];
+            foreach ($statusForm as $status) {
+                $statuscodes[$status['code']] = $status['caption'];
+            }
+            echo $this->Translate($this->evaluateStatus($statuscodes[$errorState]));
             return;
         }
 
-        $archiveID = IPS_GetInstanceListByModuleID('{43192F0B-135B-4CE7-A0A7-1475603F3060}')[0];
         $aggregationLevel = $this->ReadPropertyInteger('Level');
         switch ($aggregationLevel) {
             case LVL_DAY:
@@ -91,55 +128,6 @@ class Betriebsstundenzaehler extends IPSModule
             $seconds += $value['Avg'] * $value['Duration'];
         }
         $this->SetValue('OperatingHours', ($seconds / (60 * 60)));
-    }
-
-    private function CheckSourceVariable()
-    {
-        $source = $this->ReadPropertyInteger('Source');
-        $archiveID = IPS_GetInstanceListByModuleID('{43192F0B-135B-4CE7-A0A7-1475603F3060}')[0];
-        $returnStatus = 0;
-        if (!$this->ReadPropertyBoolean('Active')) {
-            $this->SetErrorState(104);
-            return 104;
-        } elseif ($source == 0) {
-            $this->SetErrorState(202);
-            return 202;
-        } elseif (!IPS_VariableExists($source)) {
-            $this->SetErrorState(200);
-            return 200;
-        } elseif (!AC_GetLoggingStatus($archiveID, $source) || (IPS_GetVariable($source)['VariableType'] != 0)) {
-            $this->SetErrorState(201);
-            return  201;
-        }
-        if ($this->ReadPropertyBoolean('Active')) {
-            $this->SetStatus(102);
-            return 102;
-        }
-    }
-
-    private function GetSourceStatus()
-    {
-        $source = $this->ReadPropertyInteger('Source');
-        $archiveID = IPS_GetInstanceListByModuleID('{43192F0B-135B-4CE7-A0A7-1475603F3060}')[0];
-        $returnStatus = 0;
-        if ($source == 0) {
-            $returnStatus = 202;
-        } elseif (!IPS_VariableExists($source)) {
-            $returnStatus = 200;
-        } elseif (!AC_GetLoggingStatus($archiveID, $source) || (IPS_GetVariable($source)['VariableType'] != 0)) {
-            $returnStatus = 201;
-        }
-        return $returnStatus;
-    }
-
-    private function evaluateStatus($code)
-    {
-        $statuscodes = [];
-        $statusForm = json_decode(IPS_GetConfigurationForm($this->InstanceID), true)['status'];
-        foreach ($statusForm as $status) {
-            $statuscodes[$status['code']] = $status['caption'];
-        }
-        return $statuscodes[$code];
     }
 
     private function SetErrorState($status)
