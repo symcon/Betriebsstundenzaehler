@@ -44,50 +44,34 @@ class Betriebsstundenzaehler extends IPSModule
     {
         //Never delete this line!
         parent::ApplyChanges();
-        $currentStatus = 104;
+        $newStatus = 0;
 
-        $source = $this->ReadPropertyInteger('Source');
-        $archiveID = IPS_GetInstanceListByModuleID('{43192F0B-135B-4CE7-A0A7-1475603F3060}')[0];
         if (!$this->ReadPropertyBoolean('Active')) {
-            $this->SetErrorState(104);
-            $currentStatus = 104;
-        } elseif ($source == 0) {
-            $this->SetErrorState(202);
-            $currentStatus = 202;
-        } elseif (!IPS_VariableExists($source)) {
-            $this->SetErrorState(200);
-            $currentStatus = 200;
-        } elseif (!AC_GetLoggingStatus($archiveID, $source) || (IPS_GetVariable($source)['VariableType'] != 0)) {
-            $this->SetErrorState(201);
-            $currentStatus = 201;
+            $newStatus = 104;
+        } else {
+            $newStatus = $this->getErrorState();
         }
-        if ($this->ReadPropertyBoolean('Active')) {
+        if ($this->ReadPropertyBoolean('Active') && $newStatus == 0) {
             $this->SetStatus(102);
-            $currentStatus = 102;
+            $newStatus = 102;
+        } else {
+            $this->SetStatus($newStatus);
+            $this->SetTimerInterval('UpdateCalculationTimer', 0);
+            $this->SetValue('OperatingHours', 0);
+            return;
         }
 
-        if ($currentStatus == 102) {
-            if ($this->ReadPropertyBoolean('Active') && $this->GetTimerInterval('UpdateCalculationTimer') < ($this->ReadPropertyInteger('Interval') * 1000 * 60)) {
-                $this->SetTimerInterval('UpdateCalculationTimer', $this->ReadPropertyInteger('Interval') * 1000 * 60);
-            } elseif (!$this->ReadPropertyBoolean('Active')) {
-                $this->SetTimerInterval('UpdateCalculationTimer', 0);
-            }
-            $this->Calculate();
+        if ($this->ReadPropertyBoolean('Active') && $this->GetTimerInterval('UpdateCalculationTimer') < ($this->ReadPropertyInteger('Interval') * 1000 * 60)) {
+            $this->SetTimerInterval('UpdateCalculationTimer', $this->ReadPropertyInteger('Interval') * 1000 * 60);
+        } elseif (!$this->ReadPropertyBoolean('Active')) {
+            $this->SetTimerInterval('UpdateCalculationTimer', 0);
         }
+        $this->Calculate();
     }
 
     public function Calculate()
     {
-        $source = $this->ReadPropertyInteger('Source');
-        $archiveID = IPS_GetInstanceListByModuleID('{43192F0B-135B-4CE7-A0A7-1475603F3060}')[0];
-        $errorState = 0;
-        if ($source == 0) {
-            $errorState = 202;
-        } elseif (!IPS_VariableExists($source)) {
-            $errorState = 200;
-        } elseif (!AC_GetLoggingStatus($archiveID, $source) || (IPS_GetVariable($source)['VariableType'] != 0)) {
-            $errorState = 201;
-        }
+        $errorState = $this->getErrorState();
 
         if ($errorState != 0) {
             $statuscodes = [];
@@ -120,6 +104,7 @@ class Betriebsstundenzaehler extends IPSModule
             default:
                 $startTime = 0;
             }
+        $archiveID = IPS_GetInstanceListByModuleID('{43192F0B-135B-4CE7-A0A7-1475603F3060}')[0];
         $values = AC_GetAggregatedValues($archiveID, $this->ReadPropertyInteger('Source'), $aggregationLevel, $startTime, time(), 0);
         $this->SendDebug('AggregatedValues', json_encode($values), 0);
         $seconds = 0;
@@ -129,10 +114,17 @@ class Betriebsstundenzaehler extends IPSModule
         $this->SetValue('OperatingHours', ($seconds / (60 * 60)));
     }
 
-    private function SetErrorState($status)
+    private function getErrorState()
     {
-        $this->SetStatus($status);
-        $this->SetTimerInterval('UpdateCalculationTimer', 0);
-        $this->SetValue('OperatingHours', 0);
+        $source = $this->ReadPropertyInteger('Source');
+        $archiveID = IPS_GetInstanceListByModuleID('{43192F0B-135B-4CE7-A0A7-1475603F3060}')[0];
+        $returnState = 0;
+        if ($source == 0) {
+            $returnState = 202;
+        } elseif (!IPS_VariableExists($source)) {
+            $returnState = 200;
+        } elseif (!AC_GetLoggingStatus($archiveID, $source) || (IPS_GetVariable($source)['VariableType'] != 0)) {
+            $returnState = 201;
+        }
     }
 }
