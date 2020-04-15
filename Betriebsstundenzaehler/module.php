@@ -85,22 +85,27 @@ class Betriebsstundenzaehler extends IPSModule
             case LVL_DAY:
                 $startTime = strtotime('today 00:00:00', time());
                 break;
+
             case LVL_WEEK:
                 $startTime = strtotime('last monday 00:00:00', time());
                 break;
+
             case LVL_MONTH:
                 $startTime = strtotime('first day of this month 00:00:00', time());
                 break;
+
             case LVL_YEAR:
                 $startTime = strtotime('1st january 00:00:00', time());
                 break;
+
             case LVL_COMPLETE:
                 $startTime = 0;
                 $aggregationLevel = 4;
                 break;
+
             default:
                 $startTime = 0;
-            }
+        }
         $archiveID = IPS_GetInstanceListByModuleID('{43192F0B-135B-4CE7-A0A7-1475603F3060}')[0];
         $values = AC_GetAggregatedValues($archiveID, $this->ReadPropertyInteger('Source'), $aggregationLevel, $startTime, time(), 0);
         $this->SendDebug('AggregatedValues', json_encode($values), 0);
