@@ -44,18 +44,15 @@ class Betriebsstundenzaehler extends IPSModule
     {
         //Never delete this line!
         parent::ApplyChanges();
-        $newStatus = 0;
+        $newStatus = 102;
 
         if (!$this->ReadPropertyBoolean('Active')) {
             $newStatus = 104;
         } else {
             $newStatus = $this->getErrorState();
         }
-        if ($this->ReadPropertyBoolean('Active') && $newStatus == 0) {
-            $this->SetStatus(102);
-            $newStatus = 102;
-        } else {
-            $this->SetStatus($newStatus);
+        $this->SetStatus($newStatus);
+        if ($newStatus != 102) {
             $this->SetTimerInterval('UpdateCalculationTimer', 0);
             $this->SetValue('OperatingHours', 0);
             return;
@@ -73,13 +70,13 @@ class Betriebsstundenzaehler extends IPSModule
     {
         $errorState = $this->getErrorState();
 
-        if ($errorState != 0) {
+        if ($errorState != 102) {
             $statuscodes = [];
             $statusForm = json_decode(IPS_GetConfigurationForm($this->InstanceID), true)['status'];
             foreach ($statusForm as $status) {
                 $statuscodes[$status['code']] = $status['caption'];
             }
-            echo $this->Translate($this->evaluateStatus($statuscodes[$errorState]));
+            echo $this->Translate($statuscodes[$errorState]);
             return;
         }
 
@@ -118,7 +115,8 @@ class Betriebsstundenzaehler extends IPSModule
     {
         $source = $this->ReadPropertyInteger('Source');
         $archiveID = IPS_GetInstanceListByModuleID('{43192F0B-135B-4CE7-A0A7-1475603F3060}')[0];
-        $returnState = 0;
+        //102 suggests everything is working not the active status
+        $returnState = 102;
         if ($source == 0) {
             $returnState = 202;
         } elseif (!IPS_VariableExists($source)) {
@@ -126,5 +124,7 @@ class Betriebsstundenzaehler extends IPSModule
         } elseif (!AC_GetLoggingStatus($archiveID, $source) || (IPS_GetVariable($source)['VariableType'] != 0)) {
             $returnState = 201;
         }
+
+        return $returnState;
     }
 }
