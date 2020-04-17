@@ -27,7 +27,8 @@ Mithilfe des Betriebsstundenzähler-Moduls kann die Betriebszeit eines Gerätes 
 
 ### 4. Einrichten der Instanzen in IP-Symcon
 
- Unter 'Instanz hinzufügen' kann das 'Betriebsstundenzähler'-Modul mithilfe der Schnellsuche gefunden werden.
+ Unter 'Instanz hinzufügen' kann das 'Betriebsstundenzähler'-Modul mithilfe des Schnellfilters gefunden werden.
+    - Weitere Informationen zum Hinzufügen von Instanzen in der [Dokumentation der Instanzen](https://www.symcon.de/service/dokumentation/konzepte/instanzen/#Instanz_hinzufügen)
 
 __Konfigurationsseite__:
 
