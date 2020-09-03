@@ -32,6 +32,9 @@ class Betriebsstundenzaehler extends IPSModule
 
         //Timer
         $this->RegisterTimer('UpdateCalculationTimer', 0, 'BSZ_Calculate($_IPS[\'TARGET\']);');
+
+        //Messages
+        $this->RegisterMessage(0, IPS_KERNELMESSAGE);
     }
 
     public function Destroy()
@@ -44,6 +47,15 @@ class Betriebsstundenzaehler extends IPSModule
     {
         //Never delete this line!
         parent::ApplyChanges();
+
+        //Only call this in READY state. On startup the ArchiveControl instance might not be available yet
+        if (IPS_GetKernelRunlevel() == KR_READY) {
+            $this->setupInstance();
+        }
+    }
+
+    private function setupInstance()
+    {
         $newStatus = 102;
 
         if (!$this->ReadPropertyBoolean('Active')) {
@@ -63,7 +75,14 @@ class Betriebsstundenzaehler extends IPSModule
         } elseif (!$this->ReadPropertyBoolean('Active')) {
             $this->SetTimerInterval('UpdateCalculationTimer', 0);
         }
-        $this->Calculate();
+    }
+
+    public function MessageSink($TimeStamp, $SenderID, $Message, $Data)
+    {
+        //Calculate when the archive module is loaded
+        if ($Message == IPS_KERNELMESSAGE && $Data[0] == KR_READY) {
+            $this->setupInstance();
+        }
     }
 
     public function Calculate()
