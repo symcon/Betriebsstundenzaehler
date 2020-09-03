@@ -54,29 +54,6 @@ class Betriebsstundenzaehler extends IPSModule
         }
     }
 
-    private function setupInstance()
-    {
-        $newStatus = 102;
-
-        if (!$this->ReadPropertyBoolean('Active')) {
-            $newStatus = 104;
-        } else {
-            $newStatus = $this->getErrorState();
-        }
-        $this->SetStatus($newStatus);
-        if ($newStatus != 102) {
-            $this->SetTimerInterval('UpdateCalculationTimer', 0);
-            $this->SetValue('OperatingHours', 0);
-            return;
-        }
-
-        if ($this->ReadPropertyBoolean('Active') && $this->GetTimerInterval('UpdateCalculationTimer') < ($this->ReadPropertyInteger('Interval') * 1000 * 60)) {
-            $this->SetTimerInterval('UpdateCalculationTimer', $this->ReadPropertyInteger('Interval') * 1000 * 60);
-        } elseif (!$this->ReadPropertyBoolean('Active')) {
-            $this->SetTimerInterval('UpdateCalculationTimer', 0);
-        }
-    }
-
     public function MessageSink($TimeStamp, $SenderID, $Message, $Data)
     {
         //Calculate when the archive module is loaded
@@ -133,6 +110,29 @@ class Betriebsstundenzaehler extends IPSModule
             $seconds += $value['Avg'] * $value['Duration'];
         }
         $this->SetValue('OperatingHours', ($seconds / (60 * 60)));
+    }
+
+    private function setupInstance()
+    {
+        $newStatus = 102;
+
+        if (!$this->ReadPropertyBoolean('Active')) {
+            $newStatus = 104;
+        } else {
+            $newStatus = $this->getErrorState();
+        }
+        $this->SetStatus($newStatus);
+        if ($newStatus != 102) {
+            $this->SetTimerInterval('UpdateCalculationTimer', 0);
+            $this->SetValue('OperatingHours', 0);
+            return;
+        }
+
+        if ($this->ReadPropertyBoolean('Active') && $this->GetTimerInterval('UpdateCalculationTimer') < ($this->ReadPropertyInteger('Interval') * 1000 * 60)) {
+            $this->SetTimerInterval('UpdateCalculationTimer', $this->ReadPropertyInteger('Interval') * 1000 * 60);
+        } elseif (!$this->ReadPropertyBoolean('Active')) {
+            $this->SetTimerInterval('UpdateCalculationTimer', 0);
+        }
     }
 
     private function getErrorState()
