@@ -130,10 +130,7 @@ class Betriebsstundenzaehler extends IPSModule
 
         if ($this->GetTimerInterval('UpdateCalculationTimer') < ($this->ReadPropertyInteger('Interval') * 1000 * 60)) {
             $this->SetTimerInterval('UpdateCalculationTimer', $this->ReadPropertyInteger('Interval') * 1000 * 60);
-        } elseif (!$this->ReadPropertyBoolean('Active')) {
-            $this->SetTimerInterval('UpdateCalculationTimer', 0);
         }
-
         $this->Calculate();
     }
 
