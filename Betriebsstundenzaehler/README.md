@@ -34,10 +34,10 @@ __Konfigurationsseite__:
 
 Name                     | Beschreibung
 ------------------------ | ------------------
+Aktiv                    | Legt fest ob die Rechnung auf Basis des eingestellten Intervalls aktualisiert wird
 Quelle                   | Die Variable vom Typ Boolean, welche den Aktivitätsstatus eines Gerätes anzeigt, wobei true als aktiv angesehen wird. Um die Betriebsstunden zu errechnen muss diese Variable geloggt sein
 Stufe                    | Die Stufe legt den Beginn des Zeitraums fest welcher betrachtet wird (Beginn des Tages, Woche, Monat, Jahr)
 Aktualisierungsintervall | Das Intervall in Minuten in dem die Betriebszeit erneut berechnet wird
-Aktiv                    | Legt fest ob die Rechnung auf Basis des eingestellten Intervalls aktualisiert wird
 Berechnen                | Berechnet die Betriebszeit mit allen angegebenen Parametern
 
 ### 5. Statusvariablen und Profile
