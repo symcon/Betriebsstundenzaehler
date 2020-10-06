@@ -32,6 +32,9 @@ class Betriebsstundenzaehler extends IPSModule
 
         //Timer
         $this->RegisterTimer('UpdateCalculationTimer', 0, 'BSZ_Calculate($_IPS[\'TARGET\']);');
+
+        //Messages
+        $this->RegisterMessage(0, IPS_KERNELMESSAGE);
     }
 
     public function Destroy()
@@ -44,26 +47,19 @@ class Betriebsstundenzaehler extends IPSModule
     {
         //Never delete this line!
         parent::ApplyChanges();
-        $newStatus = 102;
 
-        if (!$this->ReadPropertyBoolean('Active')) {
-            $newStatus = 104;
-        } else {
-            $newStatus = $this->getErrorState();
+        //Only call this in READY state. On startup the ArchiveControl instance might not be available yet
+        if (IPS_GetKernelRunlevel() == KR_READY) {
+            $this->setupInstance();
         }
-        $this->SetStatus($newStatus);
-        if ($newStatus != 102) {
-            $this->SetTimerInterval('UpdateCalculationTimer', 0);
-            $this->SetValue('OperatingHours', 0);
-            return;
-        }
+    }
 
-        if ($this->ReadPropertyBoolean('Active') && $this->GetTimerInterval('UpdateCalculationTimer') < ($this->ReadPropertyInteger('Interval') * 1000 * 60)) {
-            $this->SetTimerInterval('UpdateCalculationTimer', $this->ReadPropertyInteger('Interval') * 1000 * 60);
-        } elseif (!$this->ReadPropertyBoolean('Active')) {
-            $this->SetTimerInterval('UpdateCalculationTimer', 0);
+    public function MessageSink($TimeStamp, $SenderID, $Message, $Data)
+    {
+        //Calculate when the archive module is loaded
+        if ($Message == IPS_KERNELMESSAGE && $Data[0] == KR_READY) {
+            $this->setupInstance();
         }
-        $this->Calculate();
     }
 
     public function Calculate()
@@ -114,6 +110,28 @@ class Betriebsstundenzaehler extends IPSModule
             $seconds += $value['Avg'] * $value['Duration'];
         }
         $this->SetValue('OperatingHours', ($seconds / (60 * 60)));
+    }
+
+    private function setupInstance()
+    {
+        $newStatus = 102;
+
+        if (!$this->ReadPropertyBoolean('Active')) {
+            $newStatus = 104;
+        } else {
+            $newStatus = $this->getErrorState();
+        }
+        $this->SetStatus($newStatus);
+        if ($newStatus != 102) {
+            $this->SetTimerInterval('UpdateCalculationTimer', 0);
+            $this->SetValue('OperatingHours', 0);
+            return;
+        }
+
+        if ($this->GetTimerInterval('UpdateCalculationTimer') < ($this->ReadPropertyInteger('Interval') * 1000 * 60)) {
+            $this->SetTimerInterval('UpdateCalculationTimer', $this->ReadPropertyInteger('Interval') * 1000 * 60);
+        }
+        $this->Calculate();
     }
 
     private function getErrorState()
