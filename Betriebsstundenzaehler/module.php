@@ -85,54 +85,52 @@ class Betriebsstundenzaehler extends IPSModule
         switch ($aggregationLevel) {
             case LVL_DAY:
                 $startTime = strtotime('today 00:00:00', time());
+                $timeLast = strtotime('yesterday' , time());
                 break;
 
             case LVL_WEEK:
                 $startTime = strtotime('last monday 00:00:00', time());
+                $timeLast = strtotime('-1 week', time());
                 break;
 
             case LVL_MONTH:
                 $startTime = strtotime('first day of this month 00:00:00', time());
+                $timeLast = strtotime('-1 month', time());
                 break;
 
             case LVL_YEAR:
                 $startTime = strtotime('1st january 00:00:00', time());
+                $timeLast = strtotime('-1 year', time());
                 break;
 
             case LVL_COMPLETE:
                 $startTime = 0;
                 $aggregationLevel = 4;
+                $timeLast = 0;
                 break;
 
             default:
                 $startTime = 0;
+                $timeLast = 0;
         }
+
         $archiveID = IPS_GetInstanceListByModuleID('{43192F0B-135B-4CE7-A0A7-1475603F3060}')[0];
-        $values = AC_GetAggregatedValues($archiveID, $this->ReadPropertyInteger('Source'), $aggregationLevel, $startTime, time(), 0);
-        $this->SendDebug('AggregatedValues', json_encode($values), 0);
-        $seconds = 0;
-        foreach ($values as $value) {
-            $seconds += $value['Avg'] * $value['Duration'];
-        }
-        $this->SetValue('OperatingHours', ($seconds / (60 * 60)));
-
-        $timeThis = strtotime('today', time())-1;
-        $timeLast = strtotime('yesterday', time());
-        //$this->SetValue('CostLastPeriod', $this->GetValue('CostThisPeriod'));
-        $values1 = AC_GetAggregatedValues($archiveID, $this->ReadPropertyInteger('Source'), $aggregationLevel, $timeLast, $timeThis, 0);
-        $this->SendDebug('AggregatedValues', json_encode($values1), 0);
-        $seconds1 = 0;
-        foreach ($values1 as $value1) {
-            $seconds1 += $value1['Avg'] * $value1['Duration'];
-        }
-        $hours = $seconds1 / (60*60);
-        $this->SendDebug('Hours', $hours, 0);
-        $this->SetValue('CostLastPeriod', ($hours * $this->ReadPropertyFloat('Price')/100));
-
-        $this->SetValue('CostThisPeriod', ($this->GetValue('OperatingHours') * $this->ReadPropertyFloat('Price'))/100);
-        $this->SetValue('PredictionNextPeriod', ($this->GetValue('CostThisPeriod') * (1 + $this->ReadPropertyFloat('Price'))/100));   
+        $getHours = function($timeStart, $timeEnd) use ($archiveID, $aggregationLevel){
+            $values = AC_GetAggregatedValues($archiveID, $this->ReadPropertyInteger('Source'), $aggregationLevel, $timeStart, $timeEnd, 0);
+            $this->SendDebug('AggregatedValues', json_encode($values), 0);
+            $seconds = 0;
+            foreach ($values as $value) {
+                $seconds += $value['Avg'] * $value['Duration'];
+            }
+            return $seconds / (60*60);
+        };
         
+        $this->SetValue('OperatingHours', $getHours($startTime, time()));
         
+        $this->SetValue('CostLastPeriod', ($getHours($timeLast, ($startTime-1)) * $this->ReadPropertyFloat('Price')/100));
+        $this->SetValue('CostThisPeriod', ($getHours($startTime, time()) * $this->ReadPropertyFloat('Price')/100));
+        $this->SetValue('PredictionNextPeriod', ($this->GetValue('CostThisPeriod') * (1 + $this->ReadPropertyFloat('Price'))/100));  
+
     }
 
     private function setupInstance()
