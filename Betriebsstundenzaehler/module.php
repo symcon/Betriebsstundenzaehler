@@ -20,15 +20,20 @@ class Betriebsstundenzaehler extends IPSModule
         $this->RegisterPropertyInteger('Level', LVL_DAY);
         $this->RegisterPropertyInteger('Interval', 30);
         $this->RegisterPropertyBoolean('Active', false);
+        $this->RegisterPropertyFloat('Price',0.00);
 
         //VariableProfiles
         if (!IPS_VariableProfileExists('BSZ.OperatingHours')) {
             IPS_CreateVariableProfile('BSZ.OperatingHours', 2);
             IPS_SetVariableProfileText('BSZ.OperatingHours', '', $this->Translate(' hours'));
         }
+        
 
         //Variables
         $this->RegisterVariableFloat('OperatingHours', $this->Translate('Hours of Operation'), 'BSZ.OperatingHours', 10);
+        $this->RegisterVariableFloat('CostThisPeriod', $this->Translate('Cost of this Period'), '~Euro');
+        $this->RegisterVariableFloat('PredictionNextPeriod', $this->Translate('Prediction of the next Period'), '~Euro');
+        $this->RegisterVariableFloat('CostLastPeriod', $this->Translate('Cost of the last Period'), '~Euro');
 
         //Timer
         $this->RegisterTimer('UpdateCalculationTimer', 0, 'BSZ_Calculate($_IPS[\'TARGET\']);');
@@ -110,6 +115,24 @@ class Betriebsstundenzaehler extends IPSModule
             $seconds += $value['Avg'] * $value['Duration'];
         }
         $this->SetValue('OperatingHours', ($seconds / (60 * 60)));
+
+        $timeThis = strtotime('today', time())-1;
+        $timeLast = strtotime('yesterday', time());
+        //$this->SetValue('CostLastPeriod', $this->GetValue('CostThisPeriod'));
+        $values1 = AC_GetAggregatedValues($archiveID, $this->ReadPropertyInteger('Source'), $aggregationLevel, $timeLast, $timeThis, 0);
+        $this->SendDebug('AggregatedValues', json_encode($values1), 0);
+        $seconds1 = 0;
+        foreach ($values1 as $value1) {
+            $seconds1 += $value1['Avg'] * $value1['Duration'];
+        }
+        $hours = $seconds1 / (60*60);
+        $this->SendDebug('Hours', $hours, 0);
+        $this->SetValue('CostLastPeriod', ($hours * $this->ReadPropertyFloat('Price')/100));
+
+        $this->SetValue('CostThisPeriod', ($this->GetValue('OperatingHours') * $this->ReadPropertyFloat('Price'))/100);
+        $this->SetValue('PredictionNextPeriod', ($this->GetValue('CostThisPeriod') * (1 + $this->ReadPropertyFloat('Price'))/100));   
+        
+        
     }
 
     private function setupInstance()

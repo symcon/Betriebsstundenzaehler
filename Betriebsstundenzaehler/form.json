@@ -17,6 +17,9 @@
         },
         {
             "type": "NumberSpinner", "name": "Interval", "caption": "Update Interval", "minimum": 1, "suffix": "Minutes"
+        },
+        {
+            "type": "NumberSpinner", "name": "Price", "caption":"Price", "digits":2, "minimum": 0.0, "suffix": "Cent"
         }
     ],
     "actions": [
