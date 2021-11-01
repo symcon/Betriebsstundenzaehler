@@ -20,14 +20,13 @@ class Betriebsstundenzaehler extends IPSModule
         $this->RegisterPropertyInteger('Level', LVL_DAY);
         $this->RegisterPropertyInteger('Interval', 30);
         $this->RegisterPropertyBoolean('Active', false);
-        $this->RegisterPropertyFloat('Price',0.00);
+        $this->RegisterPropertyFloat('Price', 0.00);
 
         //VariableProfiles
         if (!IPS_VariableProfileExists('BSZ.OperatingHours')) {
             IPS_CreateVariableProfile('BSZ.OperatingHours', 2);
             IPS_SetVariableProfileText('BSZ.OperatingHours', '', $this->Translate(' hours'));
         }
-        
 
         //Variables
         $this->RegisterVariableFloat('OperatingHours', $this->Translate('Hours of Operation'), 'BSZ.OperatingHours', 10);
@@ -84,53 +83,63 @@ class Betriebsstundenzaehler extends IPSModule
         $aggregationLevel = $this->ReadPropertyInteger('Level');
         switch ($aggregationLevel) {
             case LVL_DAY:
-                $startTime = strtotime('today 00:00:00', time());
-                $timeLast = strtotime('yesterday' , time());
+                $startTimeThisPeriod = strtotime('today 00:00:00', time());
+                $startTimeLastPeriod = strtotime('-1 day', $startTimeThisPeriod);
+                $endTimeThisPeriod = strtotime('+1 day', $startTimeThisPeriod);
                 break;
 
             case LVL_WEEK:
-                $startTime = strtotime('last monday 00:00:00', time());
-                $timeLast = strtotime('-1 week', time());
+                $startTimeThisPeriod = strtotime('first day of this week 00:00:00', time());
+                $startTimeLastPeriod = strtotime('-1 week', $startTimeThisPeriod);
+                $endTimeThisPeriod = strtotime('+1 week', $startTimeThisPeriod);
                 break;
 
             case LVL_MONTH:
-                $startTime = strtotime('first day of this month 00:00:00', time());
-                $timeLast = strtotime('-1 month', time());
+                $startTimeThisPeriode = strtotime('first day of this month 00:00:00', time());
+                $startTimeLastPeriod = strtotime('-1 month', $startTimeThisPeriod);
+                $endTimeThisPeriode = strtotime('+1 month', $startTimeThisPeriod);
                 break;
 
             case LVL_YEAR:
-                $startTime = strtotime('1st january 00:00:00', time());
-                $timeLast = strtotime('-1 year', time());
+                $startTimeThisPeriod = strtotime('first day of january 00:00:00', time());
+                $startTimeLastPeriod = strtotime('-1 year', $startTimeThisPeriod);
+                $endTimeThisPeriode = strtotime('+1 year', $startTimeThisPeriod);
                 break;
 
             case LVL_COMPLETE:
-                $startTime = 0;
+                $startTimeThisPeriod = 0;
                 $aggregationLevel = 4;
-                $timeLast = 0;
+                $startTimeLastPeriod = 0;
                 break;
 
             default:
-                $startTime = 0;
-                $timeLast = 0;
+                $startTimeThisPeriod = 0;
+                $startTimeLastPeriod = 0;
         }
 
         $archiveID = IPS_GetInstanceListByModuleID('{43192F0B-135B-4CE7-A0A7-1475603F3060}')[0];
-        $getHours = function($timeStart, $timeEnd) use ($archiveID, $aggregationLevel){
+        $getHours = function ($timeStart, $timeEnd) use ($archiveID, $aggregationLevel)
+        {
             $values = AC_GetAggregatedValues($archiveID, $this->ReadPropertyInteger('Source'), $aggregationLevel, $timeStart, $timeEnd, 0);
             $this->SendDebug('AggregatedValues', json_encode($values), 0);
             $seconds = 0;
             foreach ($values as $value) {
                 $seconds += $value['Avg'] * $value['Duration'];
             }
-            return $seconds / (60*60);
+            return $seconds / (60 * 60);
         };
-        
-        $this->SetValue('OperatingHours', $getHours($startTime, time()));
-        
-        $this->SetValue('CostLastPeriod', ($getHours($timeLast, ($startTime-1)) * $this->ReadPropertyFloat('Price')/100));
-        $this->SetValue('CostThisPeriod', ($getHours($startTime, time()) * $this->ReadPropertyFloat('Price')/100));
-        $this->SetValue('PredictionNextPeriod', ($this->GetValue('CostThisPeriod') * (1 + $this->ReadPropertyFloat('Price'))/100));  
 
+        $this->SetValue('OperatingHours', $getHours($startTimeThisPeriod, time()));
+
+            $this->SetValue('CostLastPeriod', ($getHours($startTimeLastPeriod, ($startTimeThisPeriod - 1)) * $this->ReadPropertyFloat('Price') / 100));
+            $this->SetValue('CostThisPeriod', ($getHours($startTimeThisPeriod, time()) * $this->ReadPropertyFloat('Price') / 100));
+
+            if ($this->ReadPropertyInteger('Level') != LVL_COMPLETE) {
+                $currendDuration = time() - $startTimeThisPeriod;
+                $endOfDuration = $endTimeThisPeriod - $startTimeThisPeriod;
+                $percentOfCurrendPeriod = $currendDuration / $endOfDuration;
+                $this->SetValue('PredictionThisPeriod', ($this->GetValue('CostThisPeriod') / $percentOfCurrendPeriod * 100));
+            }
     }
 
     private function setupInstance()

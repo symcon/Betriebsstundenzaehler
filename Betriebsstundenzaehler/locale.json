@@ -18,10 +18,10 @@
             " hours": " Stunden",
             "Active": "Aktiv",
             "Calculate": "Berechnen",
-            "Cost of this Period": "Kosten des jetzigen Zeitraums",
-            "Cost of the next Period": "Kosten des nächsten Zeitraumes",
-            "Cost of the last Period": "Kosten des letzten Zeitraumes",
-            " cent": "Cent"
+            "Cost of this period": "Kosten des jetzigen Zeitraums",
+            "Prediction end of this period": "Kosten am Ende des Zeitraumes",
+            "Cost of the last period": "Kosten des letzten Zeitraumes",
+            "cent": "Cent"
         }
     }
 }
