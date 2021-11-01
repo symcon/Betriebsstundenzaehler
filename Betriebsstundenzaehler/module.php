@@ -21,6 +21,7 @@ class Betriebsstundenzaehler extends IPSModule
         $this->RegisterPropertyInteger('Interval', 30);
         $this->RegisterPropertyBoolean('Active', false);
         $this->RegisterPropertyFloat('Price', 0.00);
+        $this->RegisterPropertyBoolean('CalculateCost', false);
 
         //VariableProfiles
         if (!IPS_VariableProfileExists('BSZ.OperatingHours')) {
@@ -30,9 +31,6 @@ class Betriebsstundenzaehler extends IPSModule
 
         //Variables
         $this->RegisterVariableFloat('OperatingHours', $this->Translate('Hours of Operation'), 'BSZ.OperatingHours', 10);
-        $this->RegisterVariableFloat('CostThisPeriod', $this->Translate('Cost of this Period'), '~Euro');
-        $this->RegisterVariableFloat('PredictionNextPeriod', $this->Translate('Prediction of the next Period'), '~Euro');
-        $this->RegisterVariableFloat('CostLastPeriod', $this->Translate('Cost of the last Period'), '~Euro');
 
         //Timer
         $this->RegisterTimer('UpdateCalculationTimer', 0, 'BSZ_Calculate($_IPS[\'TARGET\']);');
@@ -131,6 +129,8 @@ class Betriebsstundenzaehler extends IPSModule
 
         $this->SetValue('OperatingHours', $getHours($startTimeThisPeriod, time()));
 
+        //Check aktiv
+        if ($this->ReadPropertyBoolean('CalculateCost')) {
             $this->SetValue('CostLastPeriod', ($getHours($startTimeLastPeriod, ($startTimeThisPeriod - 1)) * $this->ReadPropertyFloat('Price') / 100));
             $this->SetValue('CostThisPeriod', ($getHours($startTimeThisPeriod, time()) * $this->ReadPropertyFloat('Price') / 100));
 
@@ -140,6 +140,7 @@ class Betriebsstundenzaehler extends IPSModule
                 $percentOfCurrendPeriod = $currendDuration / $endOfDuration;
                 $this->SetValue('PredictionThisPeriod', ($this->GetValue('CostThisPeriod') / $percentOfCurrendPeriod * 100));
             }
+        }
     }
 
     private function setupInstance()
@@ -161,6 +162,11 @@ class Betriebsstundenzaehler extends IPSModule
         if ($this->GetTimerInterval('UpdateCalculationTimer') < ($this->ReadPropertyInteger('Interval') * 1000 * 60)) {
             $this->SetTimerInterval('UpdateCalculationTimer', $this->ReadPropertyInteger('Interval') * 1000 * 60);
         }
+
+        $this->MaintainVariable('CostThisPeriod', $this->Translate('Cost of this period'), VARIABLETYPE_FLOAT, '~Euro', 0, $this->ReadPropertyBoolean('CalculateCost'));
+        $this->MaintainVariable('PredictionThisPeriod', $this->Translate('Prediction end of this period'), VARIABLETYPE_FLOAT, '~Euro', 0, $this->ReadPropertyBoolean('CalculateCost'));
+        $this->MaintainVariable('CostLastPeriod', $this->Translate('Cost of the last period'), VARIABLETYPE_FLOAT, '~Euro', 0, $this->ReadPropertyBoolean('CalculateCost'));
+
         $this->Calculate();
     }
 

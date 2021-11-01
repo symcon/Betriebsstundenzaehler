@@ -45,6 +45,11 @@
             "suffix": "Minutes"
         },
         {
+            "type": "CheckBox",
+            "name": "CalculateCost",
+            "caption": "CalculateCost"
+        },
+        {
             "type": "NumberSpinner",
             "name": "Price",
             "caption": "Price",
