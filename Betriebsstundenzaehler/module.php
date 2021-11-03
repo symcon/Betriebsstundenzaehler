@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+include_once __DIR__ . '/timetest.php';
+
 define('LVL_DAY', 1);
 define('LVL_WEEK', 2);
 define('LVL_MONTH', 3);
@@ -10,6 +12,7 @@ define('LVL_COMPLETE', 5);
 
 class Betriebsstundenzaehler extends IPSModule
 {
+    use TestTime;
     public function Create()
     {
         //Never delete this line!
@@ -66,42 +69,45 @@ class Betriebsstundenzaehler extends IPSModule
 
     public function Calculate()
     {
-        $errorState = $this->getErrorState();
+        // Do not throw this message during testing. Verifying the status code is enough
+        if (!defined('PHPUNIT_TESTSUITE')) {
+            $errorState = $this->getErrorState();
 
-        if ($errorState != 102) {
-            $statuscodes = [];
-            $statusForm = json_decode(IPS_GetConfigurationForm($this->InstanceID), true)['status'];
-            foreach ($statusForm as $status) {
-                $statuscodes[$status['code']] = $status['caption'];
+            if ($errorState != 102) {
+                $statuscodes = [];
+                $statusForm = json_decode(IPS_GetConfigurationForm($this->InstanceID), true)['status'];
+                foreach ($statusForm as $status) {
+                    $statuscodes[$status['code']] = $status['caption'];
+                }
+                echo $this->Translate($statuscodes[$errorState]);
+                return;
             }
-            echo $this->Translate($statuscodes[$errorState]);
-            return;
         }
 
         $aggregationLevel = $this->ReadPropertyInteger('Level');
         switch ($aggregationLevel) {
             case LVL_DAY:
-                $startTimeThisPeriod = strtotime('today 00:00:00', time());
+                $startTimeThisPeriod = strtotime('today 00:00:00', $this->getTime());
                 $startTimeLastPeriod = strtotime('-1 day', $startTimeThisPeriod);
                 $endTimeThisPeriod = strtotime('+1 day', $startTimeThisPeriod);
                 break;
 
             case LVL_WEEK:
-                $startTimeThisPeriod = strtotime('first day of this week 00:00:00', time());
+                $startTimeThisPeriod = strtotime('first day of this week 00:00:00', $this->getTime());
                 $startTimeLastPeriod = strtotime('-1 week', $startTimeThisPeriod);
                 $endTimeThisPeriod = strtotime('+1 week', $startTimeThisPeriod);
                 break;
 
             case LVL_MONTH:
-                $startTimeThisPeriode = strtotime('first day of this month 00:00:00', time());
+                $startTimeThisPeriod = strtotime('first day of this month 00:00:00', $this->getTime());
                 $startTimeLastPeriod = strtotime('-1 month', $startTimeThisPeriod);
-                $endTimeThisPeriode = strtotime('+1 month', $startTimeThisPeriod);
+                $endTimeThisPeriod = strtotime('+1 month', $startTimeThisPeriod);
                 break;
 
             case LVL_YEAR:
-                $startTimeThisPeriod = strtotime('first day of january 00:00:00', time());
+                $startTimeThisPeriod = strtotime('first day of january 00:00:00', $this->getTime());
                 $startTimeLastPeriod = strtotime('-1 year', $startTimeThisPeriod);
-                $endTimeThisPeriode = strtotime('+1 year', $startTimeThisPeriod);
+                $endTimeThisPeriod = strtotime('+1 year', $startTimeThisPeriod);
                 break;
 
             case LVL_COMPLETE:
@@ -127,14 +133,13 @@ class Betriebsstundenzaehler extends IPSModule
             return $seconds / (60 * 60);
         };
 
-        $this->SetValue('OperatingHours', $getHours($startTimeThisPeriod, time()));
+        $this->SetValue('OperatingHours', $getHours($startTimeThisPeriod, $this->getTime()));
 
-        //Check aktiv
         if ($this->ReadPropertyBoolean('CalculateCost')) {
             $this->SetValue('CostThisPeriod', ($getHours($startTimeThisPeriod, $this->getTime()) * $this->ReadPropertyFloat('Price') / 100));
 
             if ($this->ReadPropertyInteger('Level') != LVL_COMPLETE) {
-                $currendDuration = time() - $startTimeThisPeriod;
+                $currendDuration = $this->getTime() - $startTimeThisPeriod;
                 $endOfDuration = $endTimeThisPeriod - $startTimeThisPeriod;
                 $percentOfCurrendPeriod = $currendDuration / $endOfDuration * 100;
                 $this->SetValue('PredictionThisPeriod', ($this->GetValue('CostThisPeriod') / $percentOfCurrendPeriod * 100));
