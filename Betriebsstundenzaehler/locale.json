@@ -17,7 +17,13 @@
             "Hours of Operation": "Betriebsstunden",
             " hours": " Stunden",
             "Active": "Aktiv",
-            "Calculate": "Berechnen"
+            "Calculate": "Berechnen",
+            "Cost of this period": "Kosten des jetzigen Zeitraums",
+            "Prediction end of this period": "Vorhersage zum Ende des Zeitraumes",
+            "Cost of the last period": "Kosten des letzten Zeitraumes",
+            "Cent per hour": "Cent pro Stunde",
+            "Calculate Cost": "Kostenberechnung",
+            "Price": "Preis"
         }
     }
 }

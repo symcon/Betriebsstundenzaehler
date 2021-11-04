@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+include_once __DIR__ . '/timetest.php';
+
 define('LVL_DAY', 1);
 define('LVL_WEEK', 2);
 define('LVL_MONTH', 3);
@@ -10,6 +12,7 @@ define('LVL_COMPLETE', 5);
 
 class Betriebsstundenzaehler extends IPSModule
 {
+    use TestTime;
     public function Create()
     {
         //Never delete this line!
@@ -20,6 +23,8 @@ class Betriebsstundenzaehler extends IPSModule
         $this->RegisterPropertyInteger('Level', LVL_DAY);
         $this->RegisterPropertyInteger('Interval', 30);
         $this->RegisterPropertyBoolean('Active', false);
+        $this->RegisterPropertyFloat('Price', 0.00);
+        $this->RegisterPropertyBoolean('CalculateCost', false);
 
         //VariableProfiles
         if (!IPS_VariableProfileExists('BSZ.OperatingHours')) {
@@ -64,52 +69,83 @@ class Betriebsstundenzaehler extends IPSModule
 
     public function Calculate()
     {
-        $errorState = $this->getErrorState();
+        // Do not throw this message during testing. Verifying the status code is enough
+        if (!defined('PHPUNIT_TESTSUITE')) {
+            $errorState = $this->getErrorState();
 
-        if ($errorState != 102) {
-            $statuscodes = [];
-            $statusForm = json_decode(IPS_GetConfigurationForm($this->InstanceID), true)['status'];
-            foreach ($statusForm as $status) {
-                $statuscodes[$status['code']] = $status['caption'];
+            if ($errorState != 102) {
+                $statuscodes = [];
+                $statusForm = json_decode(IPS_GetConfigurationForm($this->InstanceID), true)['status'];
+                foreach ($statusForm as $status) {
+                    $statuscodes[$status['code']] = $status['caption'];
+                }
+                echo $this->Translate($statuscodes[$errorState]);
+                return;
             }
-            echo $this->Translate($statuscodes[$errorState]);
-            return;
         }
 
         $aggregationLevel = $this->ReadPropertyInteger('Level');
         switch ($aggregationLevel) {
             case LVL_DAY:
-                $startTime = strtotime('today 00:00:00', time());
+                $startTimeThisPeriod = strtotime('today 00:00:00', $this->getTime());
+                $startTimeLastPeriod = strtotime('-1 day', $startTimeThisPeriod);
+                $endTimeThisPeriod = strtotime('+1 day', $startTimeThisPeriod);
                 break;
 
             case LVL_WEEK:
-                $startTime = strtotime('last monday 00:00:00', time());
+                $startTimeThisPeriod = strtotime('monday this week 00:00:00', $this->getTime());
+                $startTimeLastPeriod = strtotime('-1 week', $startTimeThisPeriod);
+                $endTimeThisPeriod = strtotime('+1 week', $startTimeThisPeriod);
                 break;
 
             case LVL_MONTH:
-                $startTime = strtotime('first day of this month 00:00:00', time());
+                $startTimeThisPeriod = strtotime('first day of this month 00:00:00', $this->getTime());
+                $startTimeLastPeriod = strtotime('-1 month', $startTimeThisPeriod);
+                $endTimeThisPeriod = strtotime('+1 month', $startTimeThisPeriod);
                 break;
 
             case LVL_YEAR:
-                $startTime = strtotime('1st january 00:00:00', time());
+                $startTimeThisPeriod = strtotime('first day of january 00:00:00', $this->getTime());
+                $startTimeLastPeriod = strtotime('-1 year', $startTimeThisPeriod);
+                $endTimeThisPeriod = strtotime('+1 year', $startTimeThisPeriod);
                 break;
 
             case LVL_COMPLETE:
-                $startTime = 0;
+                $startTimeThisPeriod = 0;
                 $aggregationLevel = 4;
+                $startTimeLastPeriod = 0;
                 break;
 
             default:
-                $startTime = 0;
+                $startTimeThisPeriod = 0;
+                $startTimeLastPeriod = 0;
         }
+
         $archiveID = IPS_GetInstanceListByModuleID('{43192F0B-135B-4CE7-A0A7-1475603F3060}')[0];
-        $values = AC_GetAggregatedValues($archiveID, $this->ReadPropertyInteger('Source'), $aggregationLevel, $startTime, time(), 0);
-        $this->SendDebug('AggregatedValues', json_encode($values), 0);
-        $seconds = 0;
-        foreach ($values as $value) {
-            $seconds += $value['Avg'] * $value['Duration'];
+        $getHours = function ($timeStart, $timeEnd) use ($archiveID, $aggregationLevel)
+        {
+            $values = AC_GetAggregatedValues($archiveID, $this->ReadPropertyInteger('Source'), $aggregationLevel, $timeStart, $timeEnd, 0);
+            $this->SendDebug('AggregatedValues', json_encode($values), 0);
+            $seconds = 0;
+            foreach ($values as $value) {
+                $seconds += $value['Avg'] * $value['Duration'];
+            }
+            return $seconds / (60 * 60);
+        };
+
+        $this->SetValue('OperatingHours', $getHours($startTimeThisPeriod, $this->getTime()));
+
+        if ($this->ReadPropertyBoolean('CalculateCost')) {
+            $this->SetValue('CostThisPeriod', $getHours($startTimeThisPeriod, $this->getTime()) * $this->ReadPropertyFloat('Price') / 100);
+
+            if ($this->ReadPropertyInteger('Level') != LVL_COMPLETE) {
+                $currendDuration = $this->getTime() - $startTimeThisPeriod;
+                $endOfDuration = $endTimeThisPeriod - $startTimeThisPeriod;
+                $percentOfCurrendPeriod = $currendDuration / $endOfDuration * 100;
+                $this->SetValue('PredictionThisPeriod', $this->GetValue('CostThisPeriod') / $percentOfCurrendPeriod * 100);
+                $this->SetValue('CostLastPeriod', $getHours($startTimeLastPeriod, ($startTimeThisPeriod - 1)) * $this->ReadPropertyFloat('Price') / 100);
+            }
         }
-        $this->SetValue('OperatingHours', ($seconds / (60 * 60)));
     }
 
     private function setupInstance()
@@ -131,6 +167,13 @@ class Betriebsstundenzaehler extends IPSModule
         if ($this->GetTimerInterval('UpdateCalculationTimer') < ($this->ReadPropertyInteger('Interval') * 1000 * 60)) {
             $this->SetTimerInterval('UpdateCalculationTimer', $this->ReadPropertyInteger('Interval') * 1000 * 60);
         }
+
+        $this->MaintainVariable('CostThisPeriod', $this->Translate('Cost of this period'), VARIABLETYPE_FLOAT, '~Euro', 0, $this->ReadPropertyBoolean('CalculateCost'));
+
+        $visible = $this->ReadPropertyBoolean('CalculateCost') && ($this->ReadPropertyInteger('Level') != LVL_COMPLETE);
+        $this->MaintainVariable('PredictionThisPeriod', $this->Translate('Prediction end of this period'), VARIABLETYPE_FLOAT, '~Euro', 0, $visible);
+        $this->MaintainVariable('CostLastPeriod', $this->Translate('Cost of the last period'), VARIABLETYPE_FLOAT, '~Euro', 0, $visible);
+
         $this->Calculate();
     }
 
