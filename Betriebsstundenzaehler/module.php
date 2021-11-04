@@ -93,7 +93,7 @@ class Betriebsstundenzaehler extends IPSModule
                 break;
 
             case LVL_WEEK:
-                $startTimeThisPeriod = strtotime('first day of this week 00:00:00', $this->getTime());
+                $startTimeThisPeriod = strtotime('monday this week 00:00:00', $this->getTime());
                 $startTimeLastPeriod = strtotime('-1 week', $startTimeThisPeriod);
                 $endTimeThisPeriod = strtotime('+1 week', $startTimeThisPeriod);
                 break;
@@ -136,14 +136,14 @@ class Betriebsstundenzaehler extends IPSModule
         $this->SetValue('OperatingHours', $getHours($startTimeThisPeriod, $this->getTime()));
 
         if ($this->ReadPropertyBoolean('CalculateCost')) {
-            $this->SetValue('CostThisPeriod', ($getHours($startTimeThisPeriod, $this->getTime()) * $this->ReadPropertyFloat('Price') / 100));
+            $this->SetValue('CostThisPeriod', $getHours($startTimeThisPeriod, $this->getTime()) * $this->ReadPropertyFloat('Price') / 100);
 
             if ($this->ReadPropertyInteger('Level') != LVL_COMPLETE) {
                 $currendDuration = $this->getTime() - $startTimeThisPeriod;
                 $endOfDuration = $endTimeThisPeriod - $startTimeThisPeriod;
                 $percentOfCurrendPeriod = $currendDuration / $endOfDuration * 100;
-                $this->SetValue('PredictionThisPeriod', ($this->GetValue('CostThisPeriod') / $percentOfCurrendPeriod * 100));
-                $this->SetValue('CostLastPeriod', ($getHours($startTimeLastPeriod, ($startTimeThisPeriod - 1)) * $this->ReadPropertyFloat('Price') / 100));
+                $this->SetValue('PredictionThisPeriod', $this->GetValue('CostThisPeriod') / $percentOfCurrendPeriod * 100);
+                $this->SetValue('CostLastPeriod', $getHours($startTimeLastPeriod, ($startTimeThisPeriod - 1)) * $this->ReadPropertyFloat('Price') / 100);
             }
         }
     }

@@ -19,9 +19,11 @@
             "Active": "Aktiv",
             "Calculate": "Berechnen",
             "Cost of this period": "Kosten des jetzigen Zeitraums",
-            "Prediction end of this period": "Kosten am Ende des Zeitraumes",
+            "Prediction end of this period": "Vorhersage zum Ende des Zeitraumes",
             "Cost of the last period": "Kosten des letzten Zeitraumes",
-            "cent": "Cent"
+            "Cent per hour": "Cent pro Stunde",
+            "Calculate Cost": "Kostenberechnung",
+            "Price": "Preis"
         }
     }
 }

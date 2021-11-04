@@ -47,7 +47,7 @@
         {
             "type": "CheckBox",
             "name": "CalculateCost",
-            "caption": "CalculateCost"
+            "caption": "Calculate Cost"
         },
         {
             "type": "NumberSpinner",
