@@ -40,7 +40,7 @@ Quelle                   | Die Variable vom Typ Boolean, welche den Aktivitätss
 Stufe                    | Die Stufe legt den Beginn des Zeitraums fest welcher betrachtet wird (Beginn des Tages, Woche, Monat, Jahr)
 Aktualisierungsintervall | Das Intervall in Minuten in dem die Betriebszeit erneut berechnet wird
 Kostenberechnung         | Legt fest ob die Kostenberechnung ausgeführt werden
-Preis                    | Der Preis welcher pro Betriebsstunden berechnet wird
+Preis                    | Der Preis welcher pro Betriebsstunde berechnet wird
 Berechnen                | Berechnet die Betriebszeit mit allen angegebenen Parametern
 
 ### 5. Statusvariablen und Profile
