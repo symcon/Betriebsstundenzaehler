@@ -15,6 +15,7 @@ Mithilfe des Betriebsstundenzähler-Moduls kann die Betriebszeit eines Gerätes 
 
 * Anzeige der Stunden, welche ein Gerät aktiv ist
 * Hinzufügen des Geräts durch eine Variable vom Typ Boolean
+* Anzeigen der Kosten für den aktuellen, den letzten Zeitraum und Vorhersage für das Ende des Zeitraums
 
 ### 2. Voraussetzungen
 
@@ -38,6 +39,8 @@ Aktiv                    | Legt fest ob die Rechnung auf Basis des eingestellten
 Quelle                   | Die Variable vom Typ Boolean, welche den Aktivitätsstatus eines Gerätes anzeigt, wobei true als aktiv angesehen wird. Um die Betriebsstunden zu errechnen muss diese Variable geloggt sein
 Stufe                    | Die Stufe legt den Beginn des Zeitraums fest welcher betrachtet wird (Beginn des Tages, Woche, Monat, Jahr)
 Aktualisierungsintervall | Das Intervall in Minuten in dem die Betriebszeit erneut berechnet wird
+Kostenberechnung         | Legt fest ob die Kostenberechnung ausgeführt werden
+Preis                    | Der Preis welcher pro Kilowattstunde berechnet wird
 Berechnen                | Berechnet die Betriebszeit mit allen angegebenen Parametern
 
 ### 5. Statusvariablen und Profile
@@ -46,9 +49,12 @@ Die Statusvariablen/Kategorien werden automatisch angelegt. Das Löschen einzeln
 
 #### Statusvariablen
 
-Name            | Typ   | Beschreibung
---------------- | ----- | ------------
-Betriebsstunden | float | Die berechneten Betriebsstunden der Quellvariable im ausgewählten Zeitraum
+Name                             | Typ   | Beschreibung
+-------------------------------- | ----- | ------------
+Betriebsstunden                  | float | Die berechneten Betriebsstunden der Quellvariable im ausgewählten Zeitraum
+Kosten des jetzigen Zeitraums    | float | Die berechneten Kosten des laufenden Zeitraums
+Kosten des letzten Zeitraums     | float | Die berechneten Kosten des letzten abgeschlossenen Zeitraums
+Vorhersge zum Ende des Zeitraums | float | Vorhersage der Kosten zum Ende des laufenden Zeitraums
 
 #### Profile
 
