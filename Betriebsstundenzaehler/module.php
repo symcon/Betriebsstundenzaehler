@@ -176,8 +176,8 @@ class Betriebsstundenzaehler extends IPSModule
 
         //Reference
 
-         //Deleting all refererences in order to readd them
-         foreach ($this->GetReferenceList() as $referenceID) {
+        //Deleting all refererences in order to readd them
+        foreach ($this->GetReferenceList() as $referenceID) {
             $this->UnregisterReference($referenceID);
         }
 
