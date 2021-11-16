@@ -174,6 +174,10 @@ class Betriebsstundenzaehler extends IPSModule
         $this->MaintainVariable('PredictionThisPeriod', $this->Translate('Prediction end of this period'), VARIABLETYPE_FLOAT, '~Euro', 0, $visible);
         $this->MaintainVariable('CostLastPeriod', $this->Translate('Cost of the last period'), VARIABLETYPE_FLOAT, '~Euro', 0, $visible);
 
+        //Reference
+        $sourceID = $this->ReadPropertyInteger('Source');
+        $this->RegisterReference($sourceID);
+
         $this->Calculate();
     }
 
