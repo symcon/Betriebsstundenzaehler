@@ -183,7 +183,9 @@ class Betriebsstundenzaehler extends IPSModule
 
         //Register References
         $sourceID = $this->ReadPropertyInteger('Source');
-        $this->RegisterReference($sourceID);
+        if ($sourceID != 0) {
+            $this->RegisterReference($sourceID);
+        }
 
         $this->Calculate();
     }
