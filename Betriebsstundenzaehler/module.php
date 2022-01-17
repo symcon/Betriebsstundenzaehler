@@ -69,17 +69,17 @@ class Betriebsstundenzaehler extends IPSModule
 
     public function Calculate()
     {
-            $errorState = $this->getErrorState();
+        $errorState = $this->getErrorState();
 
-            if ($errorState != 102) {
-                $statuscodes = [];
-                $statusForm = json_decode(IPS_GetConfigurationForm($this->InstanceID), true)['status'];
-                foreach ($statusForm as $status) {
-                    $statuscodes[$status['code']] = $status['caption'];
-                }
-                echo $this->Translate($statuscodes[$errorState]);
-                return;
+        if ($errorState != 102) {
+            $statuscodes = [];
+            $statusForm = json_decode(IPS_GetConfigurationForm($this->InstanceID), true)['status'];
+            foreach ($statusForm as $status) {
+                $statuscodes[$status['code']] = $status['caption'];
             }
+            echo $this->Translate($statuscodes[$errorState]);
+            return;
+        }
         
 
         $aggregationLevel = $this->ReadPropertyInteger('Level');
@@ -120,8 +120,7 @@ class Betriebsstundenzaehler extends IPSModule
         }
 
         $archiveID = IPS_GetInstanceListByModuleID('{43192F0B-135B-4CE7-A0A7-1475603F3060}')[0];
-        $getHours = function ($timeStart, $timeEnd) use ($archiveID, $aggregationLevel)
-        {
+        $getHours = function ($timeStart, $timeEnd) use ($archiveID, $aggregationLevel) {
             $values = AC_GetAggregatedValues($archiveID, $this->ReadPropertyInteger('Source'), $aggregationLevel, $timeStart, $timeEnd, 0);
             $this->SendDebug('AggregatedValues', json_encode($values), 0);
             $seconds = 0;
