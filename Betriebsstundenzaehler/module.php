@@ -69,8 +69,6 @@ class Betriebsstundenzaehler extends IPSModule
 
     public function Calculate()
     {
-        // Do not throw this message during testing. Verifying the status code is enough
-        if (!defined('PHPUNIT_TESTSUITE')) {
             $errorState = $this->getErrorState();
 
             if ($errorState != 102) {
@@ -82,7 +80,7 @@ class Betriebsstundenzaehler extends IPSModule
                 echo $this->Translate($statuscodes[$errorState]);
                 return;
             }
-        }
+        
 
         $aggregationLevel = $this->ReadPropertyInteger('Level');
         switch ($aggregationLevel) {
