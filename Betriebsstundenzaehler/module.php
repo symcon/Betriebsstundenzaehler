@@ -140,8 +140,8 @@ class Betriebsstundenzaehler extends IPSModule
 
             if ($this->ReadPropertyInteger('Level') != LVL_COMPLETE) {
                 $currentDuration = $this->getTime() - $startTimeThisPeriod;
-                $endOfDuration = $endTimeThisPeriod - $startTimeThisPeriod;
-                $percentOfCurrentPeriod = $currentDuration / $endOfDuration * 100;
+                $previousDuration = $endTimeThisPeriod - $startTimeThisPeriod;
+                $percentOfCurrentPeriod = $currentDuration / $previousDuration * 100;
                 $this->SetValue('PredictionThisPeriod', $this->GetValue('CostThisPeriod') / $percentOfCurrentPeriod * 100);
                 $this->SetValue('CostLastPeriod', $getHours($startTimeLastPeriod, ($startTimeThisPeriod - 1)) * $this->ReadPropertyFloat('Price') / 100);
             }
