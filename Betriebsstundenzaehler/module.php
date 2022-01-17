@@ -80,7 +80,6 @@ class Betriebsstundenzaehler extends IPSModule
             echo $this->Translate($statuscodes[$errorState]);
             return;
         }
-        
 
         $aggregationLevel = $this->ReadPropertyInteger('Level');
         switch ($aggregationLevel) {
@@ -120,7 +119,8 @@ class Betriebsstundenzaehler extends IPSModule
         }
 
         $archiveID = IPS_GetInstanceListByModuleID('{43192F0B-135B-4CE7-A0A7-1475603F3060}')[0];
-        $getHours = function ($timeStart, $timeEnd) use ($archiveID, $aggregationLevel) {
+        $getHours = function ($timeStart, $timeEnd) use ($archiveID, $aggregationLevel)
+        {
             $values = AC_GetAggregatedValues($archiveID, $this->ReadPropertyInteger('Source'), $aggregationLevel, $timeStart, $timeEnd, 0);
             $this->SendDebug('AggregatedValues', json_encode($values), 0);
             $seconds = 0;
