@@ -161,9 +161,7 @@ class Betriebsstundenzaehler extends IPSModule
             return;
         }
 
-        if ($this->GetTimerInterval('UpdateCalculationTimer') < ($this->ReadPropertyInteger('Interval') * 1000 * 60)) {
-            $this->SetTimerInterval('UpdateCalculationTimer', $this->ReadPropertyInteger('Interval') * 1000 * 60);
-        }
+        $this->SetTimerInterval('UpdateCalculationTimer', $this->ReadPropertyInteger('Interval') * 1000 * 60);
 
         $this->MaintainVariable('CostThisPeriod', $this->Translate('Cost of this period'), VARIABLETYPE_FLOAT, '~Euro', 0, $this->ReadPropertyBoolean('CalculateCost'));
 
