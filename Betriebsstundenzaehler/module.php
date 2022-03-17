@@ -69,19 +69,16 @@ class Betriebsstundenzaehler extends IPSModule
 
     public function Calculate()
     {
-        // Do not throw this message during testing. Verifying the status code is enough
-        if (!defined('PHPUNIT_TESTSUITE')) {
-            $errorState = $this->getErrorState();
+        $errorState = $this->getErrorState();
 
-            if ($errorState != 102) {
-                $statuscodes = [];
-                $statusForm = json_decode(IPS_GetConfigurationForm($this->InstanceID), true)['status'];
-                foreach ($statusForm as $status) {
-                    $statuscodes[$status['code']] = $status['caption'];
-                }
-                echo $this->Translate($statuscodes[$errorState]);
-                return;
+        if ($errorState != 102) {
+            $statuscodes = [];
+            $statusForm = json_decode(IPS_GetConfigurationForm($this->InstanceID), true)['status'];
+            foreach ($statusForm as $status) {
+                $statuscodes[$status['code']] = $status['caption'];
             }
+            echo $this->Translate($statuscodes[$errorState]);
+            return;
         }
 
         $aggregationLevel = $this->ReadPropertyInteger('Level');
@@ -139,10 +136,10 @@ class Betriebsstundenzaehler extends IPSModule
             $this->SetValue('CostThisPeriod', $getHours($startTimeThisPeriod, $this->getTime()) * $this->ReadPropertyFloat('Price') / 100);
 
             if ($this->ReadPropertyInteger('Level') != LVL_COMPLETE) {
-                $currendDuration = $this->getTime() - $startTimeThisPeriod;
-                $endOfDuration = $endTimeThisPeriod - $startTimeThisPeriod;
-                $percentOfCurrendPeriod = $currendDuration / $endOfDuration * 100;
-                $this->SetValue('PredictionThisPeriod', $this->GetValue('CostThisPeriod') / $percentOfCurrendPeriod * 100);
+                $currentDuration = $this->getTime() - $startTimeThisPeriod;
+                $previousDuration = $endTimeThisPeriod - $startTimeThisPeriod;
+                $percentOfCurrentPeriod = $currentDuration / $previousDuration * 100;
+                $this->SetValue('PredictionThisPeriod', $this->GetValue('CostThisPeriod') / $percentOfCurrentPeriod * 100);
                 $this->SetValue('CostLastPeriod', $getHours($startTimeLastPeriod, ($startTimeThisPeriod - 1)) * $this->ReadPropertyFloat('Price') / 100);
             }
         }
