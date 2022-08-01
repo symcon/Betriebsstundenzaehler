@@ -40,6 +40,7 @@ Quelle                   | Die Variable vom Typ Boolean, welche den Aktivitätss
 Stufe                    | Die Stufe legt den Beginn des Zeitraums fest welcher betrachtet wird (Beginn des Tages, Woche, Monat, Jahr)
 Aktualisierungsintervall | Das Intervall in Minuten in dem die Betriebszeit erneut berechnet wird
 Kostenberechnung         | Legt fest ob die Kostenberechnung ausgeführt werden
+Preistyp                 | Option, ob der Preis fest gelegt ist oder dynamisch über eine Variable berechnet werden soll
 Preis                    | Der Preis welcher pro Betriebsstunde berechnet wird
 Berechnen                | Berechnet die Betriebszeit mit allen angegebenen Parametern
 
@@ -74,3 +75,19 @@ Die Betriebsstunden-Variable wird auf den errechneten Wert gesetzt.
 
 Beispiel:
 `BSZ_Calculate(12345);`
+
+
+`void BSZ_FormPriceType(integer $InstanzID, String $value);`
+
+Setzt die Sichtbarkeit der Preistyp Option im Konfigurationsformular.
+
+Beispiel:
+`BSZ_FormPriceType(12345, "Static");`
+
+
+`void BSZ_FormCalculateCost(integer $InstanzID, String $value);`
+
+Setzt die Sichtbarkeit der Preisoption im Konfigurationsformular.
+
+Beispiel:
+`BSZ_FormCalculateCost(12345, true);`

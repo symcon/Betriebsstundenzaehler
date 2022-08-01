@@ -48,7 +48,7 @@
             "type": "CheckBox",
             "name": "CalculateCost",
             "caption": "Calculate Cost",
-            "onChange": "BSZ_isCalculate($id, $CalculateCost);"
+            "onChange": "BSZ_FormCalculateCost($id, $CalculateCost);"
         },
         {
             "type": "Select",
@@ -64,7 +64,7 @@
                     "value": "Dynamic"
                 }
             ],
-            "onChange": "BSZ_PriceType($id, $PriceType);"
+            "onChange": "BSZ_FormPriceType($id, $PriceType);"
         },
         {
             "type": "NumberSpinner",

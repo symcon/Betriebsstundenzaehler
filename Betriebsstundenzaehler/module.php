@@ -84,7 +84,7 @@ class Betriebsstundenzaehler extends IPSModule
         return json_encode($form);
     }
 
-    public function PriceType(string $status)
+    public function FormPriceType(string $status)
     {
         if ($status == 'Static') {
             $this->UpdateFormField('Price', 'visible', true);
@@ -95,7 +95,7 @@ class Betriebsstundenzaehler extends IPSModule
         }
     }
 
-    public function isCalculate(bool $calculate)
+    public function FormCalculateCost(bool $calculate)
     {
         if ($calculate) {
             $this->UpdateFormField('PriceType', 'visible', true);
