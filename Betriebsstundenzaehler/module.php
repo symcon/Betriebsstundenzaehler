@@ -25,6 +25,8 @@ class Betriebsstundenzaehler extends IPSModule
         $this->RegisterPropertyBoolean('Active', false);
         $this->RegisterPropertyFloat('Price', 0.00);
         $this->RegisterPropertyBoolean('CalculateCost', false);
+        $this->RegisterPropertyString('PriceType', 'Static');
+        $this->RegisterPropertyInteger('PriceDynamic', 1);
 
         //VariableProfiles
         if (!IPS_VariableProfileExists('BSZ.OperatingHours')) {
@@ -64,6 +66,46 @@ class Betriebsstundenzaehler extends IPSModule
         //Calculate when the archive module is loaded
         if ($Message == IPS_KERNELMESSAGE && $Data[0] == KR_READY) {
             $this->setupInstance();
+        }
+    }
+
+    public function GetConfigurationForm()
+    {
+        $form = json_decode(file_get_contents('form.json', true), true);
+
+        $isCalculateCost = $this->ReadPropertyBoolean('CalculateCost');
+        $priceType = $this->ReadPropertyString('PriceType');
+
+        //5 = PriceType, 6 = Price, 7 = DynamicPrice
+        $form['elements'][5]['visible'] = $isCalculateCost;
+        $form['elements'][6]['visible'] = $priceType == 'Static' && $isCalculateCost;
+        $form['elements'][7]['visible'] = $priceType == 'Dynamic' && $isCalculateCost;
+
+        return json_encode($form);
+    }
+
+    public function PriceType(string $status)
+    {
+        if ($status == 'Static') {
+            $this->UpdateFormField('Price', 'visible', true);
+            $this->UpdateFormField('PriceDynamic', 'visible', false);
+        } else {
+            $this->UpdateFormField('Price', 'visible', false);
+            $this->UpdateFormField('PriceDynamic', 'visible', true);
+        }
+    }
+
+    public function isCalculate(bool $calculate)
+    {
+        if ($calculate) {
+            $this->UpdateFormField('PriceType', 'visible', true);
+            $priceType = $this->ReadPropertyString('PriceType');
+            $this->UpdateFormField('Price', 'visible', $priceType == 'Static');
+            $this->UpdateFormField('PriceDynamic', 'visible', $priceType == 'Dynamic');
+        } else {
+            $this->UpdateFormField('PriceType', 'visible', false);
+            $this->UpdateFormField('Price', 'visible', false);
+            $this->UpdateFormField('PriceDynamic', 'visible', false);
         }
     }
 
@@ -119,10 +161,9 @@ class Betriebsstundenzaehler extends IPSModule
         }
 
         $archiveID = IPS_GetInstanceListByModuleID('{43192F0B-135B-4CE7-A0A7-1475603F3060}')[0];
-        $getHours = function ($timeStart, $timeEnd) use ($archiveID, $aggregationLevel)
+        $getHours = function ($startTime, $endTime) use ($archiveID, $aggregationLevel)
         {
-            $values = AC_GetAggregatedValues($archiveID, $this->ReadPropertyInteger('Source'), $aggregationLevel, $timeStart, $timeEnd, 0);
-            $this->SendDebug('AggregatedValues', json_encode($values), 0);
+            $values = AC_GetAggregatedValues($archiveID, $this->ReadPropertyInteger('Source'), $aggregationLevel, $startTime, $endTime, 0);
             $seconds = 0;
             foreach ($values as $value) {
                 $seconds += $value['Avg'] * $value['Duration'];
@@ -130,17 +171,39 @@ class Betriebsstundenzaehler extends IPSModule
             return $seconds / (60 * 60);
         };
 
+        $dynamicCosts = function ($startTime, $endTime) use ($archiveID, $aggregationLevel)
+        {
+            $values = AC_GetAggregatedValues($archiveID, $this->ReadPropertyInteger('Source'), $aggregationLevel, $startTime, $endTime, 0);
+            $dynamicPriceID = $this->ReadPropertyInteger('PriceDynamic');
+
+            if ($dynamicPriceID >= 10000) {
+                $prices = AC_GetAggregatedValues($archiveID, $dynamicPriceID, $aggregationLevel, $startTime, $endTime, 0);
+
+                $costs = 0;
+                foreach ($values as $key =>$value) {
+                    $costs += ($value['Avg'] * $value['Duration']) * $prices[$key]['Avg'];
+                }
+            }
+
+            return $costs / 100; //Costs in Euro
+        };
+
         $this->SetValue('OperatingHours', $getHours($startTimeThisPeriod, $this->getTime()));
 
         if ($this->ReadPropertyBoolean('CalculateCost')) {
-            $this->SetValue('CostThisPeriod', $getHours($startTimeThisPeriod, $this->getTime()) * $this->ReadPropertyFloat('Price') / 100);
+            if ($this->ReadPropertyString('PriceType') == 'Static') {
+                $this->SetValue('CostThisPeriod', $getHours($startTimeThisPeriod, $this->getTime()) * $this->ReadPropertyFloat('Price') / 100);
+            } else { //Dynamic Price
+                $this->SetValue('CostThisPeriod', $dynamicCosts($startTimeThisPeriod, $this->getTime()) / 100);
+            }
 
             if ($this->ReadPropertyInteger('Level') != LVL_COMPLETE) {
                 $currentDuration = $this->getTime() - $startTimeThisPeriod;
                 $previousDuration = $endTimeThisPeriod - $startTimeThisPeriod;
                 $percentOfCurrentPeriod = $currentDuration / $previousDuration * 100;
+
                 $this->SetValue('PredictionThisPeriod', $this->GetValue('CostThisPeriod') / $percentOfCurrentPeriod * 100);
-                $this->SetValue('CostLastPeriod', $getHours($startTimeLastPeriod, ($startTimeThisPeriod - 1)) * $this->ReadPropertyFloat('Price') / 100);
+                $this->SetValue('CostLastPeriod', $getHours($startTimeLastPeriod, $startTimeThisPeriod) * $this->ReadPropertyFloat('Price') / 100);
             }
         }
     }
