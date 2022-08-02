@@ -195,7 +195,7 @@ class Betriebsstundenzaehler extends IPSModule
                 $currentDuration = $this->getTime() - $startTimeThisPeriod;
                 $previousDuration = $endTimeThisPeriod - $startTimeThisPeriod;
                 $percentOfCurrentPeriod = $currentDuration / $previousDuration * 100;
-                
+
                 $this->SetValue('PredictionThisPeriod', $this->GetValue('CostThisPeriod') / $percentOfCurrentPeriod * 100);
 
                 switch ($priceType) {

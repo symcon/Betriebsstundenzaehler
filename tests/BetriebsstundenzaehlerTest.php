@@ -406,7 +406,7 @@ class BetriebsstundenzaehlerTest extends TestBase
         $this->assertEquals(3.6, GetValue(IPS_GetObjectIDByIdent('OperatingHours', $instanceID)));
         $this->assertEquals(94.608, GetValue(IPS_GetObjectIDByIdent('CostThisPeriod', $instanceID)));
         $this->assertEquals(88.128, GetValue(IPS_GetObjectIDByIdent('CostLastPeriod', $instanceID)));
-        $this->assertEquals(189.216 , GetValue(IPS_GetObjectIDByIdent('PredictionThisPeriod', $instanceID)));
+        $this->assertEquals(189.216, GetValue(IPS_GetObjectIDByIdent('PredictionThisPeriod', $instanceID)));
 
         /**
          * Manuelle Berechnung:
