@@ -326,4 +326,95 @@ class BetriebsstundenzaehlerTest extends TestBase
             Cost This Period:			161,04 €    (8052 * 0,02);
          */
     }
+
+    public function testDynamicCosts()
+    {
+        //Variables
+        $variableID = IPS_CreateVariable(0);
+        $priceID = IPS_CreateVariable(2);
+        $archivID = $this->archiveControlID;
+        $instanceID = $this->betriebsstundenzaehlerID;
+        IPS_EnableDebug($instanceID, 600);
+
+        //Set archived settings
+        AC_SetLoggingStatus($archivID, $variableID, true);
+        AC_SetLoggingStatus($archivID, $priceID, true);
+
+        //Custom Time for Testing
+        BSZ_setTime($instanceID, strtotime('March 29 2021 12:00'));
+
+        //Add archive data for source
+        $aggregationPeriodDay = [
+            [
+                'Avg'       => 0.3,
+                'Duration'  => 24 * 60 * 60,
+                'Max'       => 0,
+                'MaxTime'   => 0,
+                'Min'       => 0,
+                'MinTime'   => 0,
+                'TimeStamp' => strtotime('March 28 2021 00:00:00'),
+            ],
+            [
+                'Avg'       => 0.3,
+                'Duration'  => 12 * 60 * 60,
+                'Max'       => 0,
+                'MaxTime'   => 0,
+                'Min'       => 0,
+                'MinTime'   => 0,
+                'TimeStamp' => strtotime('March 29 2021 00:00:00'),
+            ]
+        ];
+        AC_StubsAddAggregatedValues($archivID, $variableID, 1, $aggregationPeriodDay);
+
+        //Add archive data for price
+        $aggregationPeriodDay = [
+            [
+                'Avg'       => 0.34,
+                'Duration'  => 24 * 60 * 60,
+                'Max'       => 0,
+                'MaxTime'   => 0,
+                'Min'       => 0,
+                'MinTime'   => 0,
+                'TimeStamp' => strtotime('March 28 2021 00:00:00'),
+            ],
+            [
+                'Avg'       => 0.73,
+                'Duration'  => 12 * 60 * 60,
+                'Max'       => 0,
+                'MaxTime'   => 0,
+                'Min'       => 0,
+                'MinTime'   => 0,
+                'TimeStamp' => strtotime('March 29 2021 00:00:00'),
+            ]
+        ];
+        AC_StubsAddAggregatedValues($archivID, $priceID, 1, $aggregationPeriodDay);
+
+        //Properties
+        IPS_SetProperty($instanceID, 'PriceDynamic', $priceID);
+        IPS_SetProperty($instanceID, 'Source', $variableID);
+        IPS_SetProperty($instanceID, 'Active', true);
+        IPS_SetProperty($instanceID, 'CalculateCost', true);
+        IPS_SetProperty($instanceID, 'PriceType', 'Dynamic');
+        IPS_SetProperty($instanceID, 'Level', LVL_DAY);
+
+        IPS_ApplyChanges($instanceID);
+
+        //Not use because it calls in ApplyChanges
+        //BSZ_Calculate($instanceID);
+
+        //Assert
+        $this->assertEquals(3.6, GetValue(IPS_GetObjectIDByIdent('OperatingHours', $instanceID)));
+        $this->assertEquals(94.608, GetValue(IPS_GetObjectIDByIdent('CostThisPeriod', $instanceID)));
+        $this->assertEquals(88.128, GetValue(IPS_GetObjectIDByIdent('CostLastPeriod', $instanceID)));
+        $this->assertEquals(189.216 , GetValue(IPS_GetObjectIDByIdent('PredictionThisPeriod', $instanceID)));
+
+        /**
+         * Manuelle Berechnung:
+         * Erwartete Daten:
+         *      Operating Hours:        3.6      (12 * 0,3);
+         *      Cost This Periode:      94.608   ((12 * 60 * 60 * 0,3 * 0,73)
+         *      Cost Last Periode:      88.128   (24 * 0,3 * 0,34)
+         *      Prediction This Period: 189.216  (94,608 / (43200/ 86400 * 100) *100 )
+         */
+    }
 }

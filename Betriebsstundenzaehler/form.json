@@ -48,7 +48,7 @@
             "type": "CheckBox",
             "name": "CalculateCost",
             "caption": "Calculate Cost",
-            "onChange": "BSZ_FormCalculateCost($id, $CalculateCost);"
+            "onChange": "BSZ_FormCalculateCost($id, $CalculateCost, $PriceType);"
         },
         {
             "type": "Select",

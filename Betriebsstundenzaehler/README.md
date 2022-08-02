@@ -16,6 +16,7 @@ Mithilfe des Betriebsstundenzähler-Moduls kann die Betriebszeit eines Gerätes 
 * Anzeige der Stunden, welche ein Gerät aktiv ist
 * Hinzufügen des Geräts durch eine Variable vom Typ Boolean
 * Anzeigen der Kosten für den aktuellen, den letzten Zeitraum und Vorhersage für das Ende des Zeitraums
+* Möglichkeit die Kosten mit einem dynamischen Preis zu berechnen
 
 ### 2. Voraussetzungen
 
@@ -37,12 +38,14 @@ Name                     | Beschreibung
 ------------------------ | ------------------
 Aktiv                    | Legt fest ob die Rechnung auf Basis des eingestellten Intervalls aktualisiert wird
 Quelle                   | Die Variable vom Typ Boolean, welche den Aktivitätsstatus eines Gerätes anzeigt, wobei true als aktiv angesehen wird. Um die Betriebsstunden zu errechnen muss diese Variable geloggt sein
-Stufe                    | Die Stufe legt den Beginn des Zeitraums fest welcher betrachtet wird (Beginn des Tages, Woche, Monat, Jahr)
+Stufe                    | Die Stufe legt den Beginn des Zeitraums fest welcher betrachtet wird (Beginn des Tages, Woche, Monat, Jahr) sowie die Aggregationsstufe
 Aktualisierungsintervall | Das Intervall in Minuten in dem die Betriebszeit erneut berechnet wird
 Kostenberechnung         | Legt fest ob die Kostenberechnung ausgeführt werden
 Preistyp                 | Option, ob der Preis fest gelegt ist oder dynamisch über eine Variable berechnet werden soll
 Preis                    | Der Preis welcher pro Betriebsstunde berechnet wird
 Berechnen                | Berechnet die Betriebszeit mit allen angegebenen Parametern
+
+Ist im Preistyp die Option "Dynamisch" eingestellt, wird eine geloggte Variable gefordert, welche den Kostenpreis beinhaltet. 
 
 ### 5. Statusvariablen und Profile
 
@@ -76,18 +79,3 @@ Die Betriebsstunden-Variable wird auf den errechneten Wert gesetzt.
 Beispiel:
 `BSZ_Calculate(12345);`
 
-
-`void BSZ_FormPriceType(integer $InstanzID, String $value);`
-
-Setzt die Sichtbarkeit der Preistyp Option im Konfigurationsformular.
-
-Beispiel:
-`BSZ_FormPriceType(12345, "Static");`
-
-
-`void BSZ_FormCalculateCost(integer $InstanzID, String $value);`
-
-Setzt die Sichtbarkeit der Preisoption im Konfigurationsformular.
-
-Beispiel:
-`BSZ_FormCalculateCost(12345, true);`

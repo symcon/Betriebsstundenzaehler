@@ -71,7 +71,7 @@ class Betriebsstundenzaehler extends IPSModule
 
     public function GetConfigurationForm()
     {
-        $form = json_decode(file_get_contents('form.json', true), true);
+        $form = json_decode(file_get_contents(__DIR__ . '/form.json'), true);
 
         $isCalculateCost = $this->ReadPropertyBoolean('CalculateCost');
         $priceType = $this->ReadPropertyString('PriceType');
@@ -86,27 +86,15 @@ class Betriebsstundenzaehler extends IPSModule
 
     public function FormPriceType(string $status)
     {
-        if ($status == 'Static') {
-            $this->UpdateFormField('Price', 'visible', true);
-            $this->UpdateFormField('PriceDynamic', 'visible', false);
-        } else {
-            $this->UpdateFormField('Price', 'visible', false);
-            $this->UpdateFormField('PriceDynamic', 'visible', true);
-        }
+        $this->UpdateFormField('Price', 'visible', $status == 'Static');
+        $this->UpdateFormField('PriceDynamic', 'visible', $status == 'Dynamic');
     }
 
-    public function FormCalculateCost(bool $calculate)
+    public function FormCalculateCost(bool $calculate, string $priceType)
     {
-        if ($calculate) {
-            $this->UpdateFormField('PriceType', 'visible', true);
-            $priceType = $this->ReadPropertyString('PriceType');
-            $this->UpdateFormField('Price', 'visible', $priceType == 'Static');
-            $this->UpdateFormField('PriceDynamic', 'visible', $priceType == 'Dynamic');
-        } else {
-            $this->UpdateFormField('PriceType', 'visible', false);
-            $this->UpdateFormField('Price', 'visible', false);
-            $this->UpdateFormField('PriceDynamic', 'visible', false);
-        }
+        $this->UpdateFormField('PriceType', 'visible', $calculate);
+        $this->UpdateFormField('Price', 'visible', $calculate && $priceType == 'Static');
+        $this->UpdateFormField('PriceDynamic', 'visible', $calculate && $priceType == 'Dynamic');
     }
 
     public function Calculate()
@@ -191,19 +179,35 @@ class Betriebsstundenzaehler extends IPSModule
         $this->SetValue('OperatingHours', $getHours($startTimeThisPeriod, $this->getTime()));
 
         if ($this->ReadPropertyBoolean('CalculateCost')) {
-            if ($this->ReadPropertyString('PriceType') == 'Static') {
-                $this->SetValue('CostThisPeriod', $getHours($startTimeThisPeriod, $this->getTime()) * $this->ReadPropertyFloat('Price') / 100);
-            } else { //Dynamic Price
-                $this->SetValue('CostThisPeriod', $dynamicCosts($startTimeThisPeriod, $this->getTime()) / 100);
+            $priceType = $this->ReadPropertyString('PriceType');
+            switch ($priceType) {
+                case 'Static':
+                    $this->SetValue('CostThisPeriod', $getHours($startTimeThisPeriod, $this->getTime()) * $this->ReadPropertyFloat('Price') / 100);
+                    break;
+                case 'Dynamic':
+                    $this->SetValue('CostThisPeriod', $dynamicCosts($startTimeThisPeriod, $this->getTime()));
+                    break;
+                default:
+                    break;
             }
 
             if ($this->ReadPropertyInteger('Level') != LVL_COMPLETE) {
                 $currentDuration = $this->getTime() - $startTimeThisPeriod;
                 $previousDuration = $endTimeThisPeriod - $startTimeThisPeriod;
                 $percentOfCurrentPeriod = $currentDuration / $previousDuration * 100;
-
+                
                 $this->SetValue('PredictionThisPeriod', $this->GetValue('CostThisPeriod') / $percentOfCurrentPeriod * 100);
-                $this->SetValue('CostLastPeriod', $getHours($startTimeLastPeriod, $startTimeThisPeriod) * $this->ReadPropertyFloat('Price') / 100);
+
+                switch ($priceType) {
+                    case 'Static':
+                        $this->SetValue('CostLastPeriod', $getHours($startTimeLastPeriod, ($startTimeThisPeriod - 1)) * $this->ReadPropertyFloat('Price') / 100);
+                        break;
+                    case 'Dynamic':
+                        $this->SetValue('CostLastPeriod', $dynamicCosts($startTimeLastPeriod, ($startTimeThisPeriod - 1)));
+                        break;
+                    default:
+                        break;
+                }
             }
         }
     }
