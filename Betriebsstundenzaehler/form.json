@@ -47,7 +47,24 @@
         {
             "type": "CheckBox",
             "name": "CalculateCost",
-            "caption": "Calculate Cost"
+            "caption": "Calculate Cost",
+            "onChange": "BSZ_FormCalculateCost($id, $CalculateCost, $PriceType);"
+        },
+        {
+            "type": "Select",
+            "name": "PriceType",
+            "caption": "Price type",
+            "options": [
+                {
+                    "caption": "Static",
+                    "value": "Static"
+                },
+                {
+                    "caption": "Dynamic",
+                    "value": "Dynamic"
+                }
+            ],
+            "onChange": "BSZ_FormPriceType($id, $PriceType);"
         },
         {
             "type": "NumberSpinner",
@@ -55,7 +72,14 @@
             "caption": "Price",
             "digits": 2,
             "minimum": 0.0,
-            "suffix": "Cent per hour"
+            "suffix": "Cent per hour",
+            "visible": true
+        },
+        {
+            "type": "SelectVariable",
+            "name": "PriceDynamic",
+            "caption": "Price",
+            "visible": false
         }
     ],
     "actions": [

@@ -23,7 +23,10 @@
             "Cost of the last period": "Kosten des letzten Zeitraumes",
             "Cent per hour": "Cent pro Stunde",
             "Calculate Cost": "Kostenberechnung",
-            "Price": "Preis"
+            "Price": "Preis",
+            "Price type": "Preistyp",
+            "Static": "Statisch",
+            "Dynamic": "Dynamisch"
         }
     }
 }
