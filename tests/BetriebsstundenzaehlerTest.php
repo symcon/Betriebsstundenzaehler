@@ -54,10 +54,10 @@ class BetriebsstundenzaehlerTest extends TestBase
         //BSZ_Calculate($instanceID);
 
         //Assert
-        $this->assertEquals(6, GetValue(IPS_GetObjectIDByIdent('OperatingHours', $instanceID)));
-        $this->assertEquals(0.24, GetValue(IPS_GetObjectIDByIdent('CostLastPeriod', $instanceID)));
-        $this->assertEquals(0.12, GetValue(IPS_GetObjectIDByIdent('CostThisPeriod', $instanceID)));
-        $this->assertEquals(0.24, GetValue(IPS_GetObjectIDByIdent('PredictionThisPeriod', $instanceID)));
+        $this->assertEqualsWithDelta(6, GetValue(IPS_GetObjectIDByIdent('OperatingHours', $instanceID)), 0.0001);
+        $this->assertEqualsWithDelta(0.24, GetValue(IPS_GetObjectIDByIdent('CostLastPeriod', $instanceID)), 0.0001);
+        $this->assertEqualsWithDelta(0.12, GetValue(IPS_GetObjectIDByIdent('CostThisPeriod', $instanceID)), 0.0001);
+        $this->assertEqualsWithDelta(0.24, GetValue(IPS_GetObjectIDByIdent('PredictionThisPeriod', $instanceID)), 0.0001);
 
         /*
         Manuelle Berechnung:
@@ -117,10 +117,10 @@ class BetriebsstundenzaehlerTest extends TestBase
         //BSZ_Calculate($instanceID);
 
         //Assert
-        $this->assertEquals(84, GetValue(IPS_GetObjectIDByIdent('OperatingHours', $instanceID)));
-        $this->assertEquals(1.68, GetValue(IPS_GetObjectIDByIdent('CostThisPeriod', $instanceID)));
-        $this->assertEquals(1.68, GetValue(IPS_GetObjectIDByIdent('CostLastPeriod', $instanceID)));
-        $this->assertEquals(3.36, GetValue(IPS_GetObjectIDByIdent('PredictionThisPeriod', $instanceID)));
+        $this->assertEqualsWithDelta(84, GetValue(IPS_GetObjectIDByIdent('OperatingHours', $instanceID)), 0.0001);
+        $this->assertEqualsWithDelta(1.68, GetValue(IPS_GetObjectIDByIdent('CostThisPeriod', $instanceID)), 0.0001);
+        $this->assertEqualsWithDelta(1.68, GetValue(IPS_GetObjectIDByIdent('CostLastPeriod', $instanceID)), 0.0001);
+        $this->assertEqualsWithDelta(3.36, GetValue(IPS_GetObjectIDByIdent('PredictionThisPeriod', $instanceID)), 0.0001);
 
         /*
         Manuelle Berechnung:
@@ -180,10 +180,10 @@ class BetriebsstundenzaehlerTest extends TestBase
         //BSZ_Calculate($instanceID);
 
         //Assert
-        $this->assertEquals(168, GetValue(IPS_GetObjectIDByIdent('OperatingHours', $instanceID)));
-        $this->assertEquals(3.36, GetValue(IPS_GetObjectIDByIdent('CostThisPeriod', $instanceID)));
-        $this->assertEquals(7.44, GetValue(IPS_GetObjectIDByIdent('CostLastPeriod', $instanceID)));
-        $this->assertEquals(6.72, GetValue(IPS_GetObjectIDByIdent('PredictionThisPeriod', $instanceID)));
+        $this->assertEqualsWithDelta(168, GetValue(IPS_GetObjectIDByIdent('OperatingHours', $instanceID)), 0.0001);
+        $this->assertEqualsWithDelta(3.36, GetValue(IPS_GetObjectIDByIdent('CostThisPeriod', $instanceID)), 0.0001);
+        $this->assertEqualsWithDelta(7.44, GetValue(IPS_GetObjectIDByIdent('CostLastPeriod', $instanceID)), 0.0001);
+        $this->assertEqualsWithDelta(6.72, GetValue(IPS_GetObjectIDByIdent('PredictionThisPeriod', $instanceID)), 0.0001);
 
         /*
         Manuelle Berechnung:
@@ -244,10 +244,10 @@ class BetriebsstundenzaehlerTest extends TestBase
         //BSZ_Calculate($instanceID);
 
         //Assert
-        $this->assertEquals(525.25, GetValue(IPS_GetObjectIDByIdent('OperatingHours', $instanceID)));
-        $this->assertEquals(10.505, GetValue(IPS_GetObjectIDByIdent('CostThisPeriod', $instanceID)));
-        $this->assertEquals(122.976, GetValue(IPS_GetObjectIDByIdent('CostLastPeriod', $instanceID)));
-        $this->assertEquals(43.8, GetValue(IPS_GetObjectIDByIdent('PredictionThisPeriod', $instanceID)));
+        $this->assertEqualsWithDelta(525.25, GetValue(IPS_GetObjectIDByIdent('OperatingHours', $instanceID)), 0.0001);
+        $this->assertEqualsWithDelta(10.505, GetValue(IPS_GetObjectIDByIdent('CostThisPeriod', $instanceID)), 0.0001);
+        $this->assertEqualsWithDelta(122.976, GetValue(IPS_GetObjectIDByIdent('CostLastPeriod', $instanceID)), 0.0001);
+        $this->assertEqualsWithDelta(43.8, GetValue(IPS_GetObjectIDByIdent('PredictionThisPeriod', $instanceID)), 0.0001);
 
         /*
         Manuelle Berechnung:
@@ -316,8 +316,8 @@ class BetriebsstundenzaehlerTest extends TestBase
         //BSZ_Calculate($instanceID);
 
         //Assert
-        $this->assertEquals(8052, GetValue(IPS_GetObjectIDByIdent('OperatingHours', $instanceID)));
-        $this->assertEquals(161.04, GetValue(IPS_GetObjectIDByIdent('CostThisPeriod', $instanceID)));
+        $this->assertEqualsWithDelta(8052, GetValue(IPS_GetObjectIDByIdent('OperatingHours', $instanceID)), 0.0001);
+        $this->assertEqualsWithDelta(161.04, GetValue(IPS_GetObjectIDByIdent('CostThisPeriod', $instanceID)), 0.0001);
 
         /*
         Manuelle Berechnung:
@@ -403,10 +403,10 @@ class BetriebsstundenzaehlerTest extends TestBase
         //BSZ_Calculate($instanceID);
 
         //Assert
-        $this->assertEquals(3.6, GetValue(IPS_GetObjectIDByIdent('OperatingHours', $instanceID)));
-        $this->assertEquals(94.608, GetValue(IPS_GetObjectIDByIdent('CostThisPeriod', $instanceID)));
-        $this->assertEquals(88.128, GetValue(IPS_GetObjectIDByIdent('CostLastPeriod', $instanceID)));
-        $this->assertEquals(189.216, GetValue(IPS_GetObjectIDByIdent('PredictionThisPeriod', $instanceID)));
+        $this->assertEqualsWithDelta(3.6, GetValue(IPS_GetObjectIDByIdent('OperatingHours', $instanceID)), 0.0001);
+        $this->assertEqualsWithDelta(94.608, GetValue(IPS_GetObjectIDByIdent('CostThisPeriod', $instanceID)), 0.0001);
+        $this->assertEqualsWithDelta(88.128, GetValue(IPS_GetObjectIDByIdent('CostLastPeriod', $instanceID)), 0.0001);
+        $this->assertEqualsWithDelta(189.216, GetValue(IPS_GetObjectIDByIdent('PredictionThisPeriod', $instanceID)), 0.001);
 
         /**
          * Manuelle Berechnung:
