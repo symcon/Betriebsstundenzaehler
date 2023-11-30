@@ -10,7 +10,7 @@ define('LVL_MONTH', 3);
 define('LVL_YEAR', 4);
 define('LVL_COMPLETE', 5);
 
-class Betriebsstundenzaehler extends IPSModule
+class OperatingHoursCounter extends IPSModule
 {
     use TestTime;
     public function Create()

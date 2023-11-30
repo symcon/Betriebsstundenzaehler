@@ -26,7 +26,10 @@
             "Price": "Preis",
             "Price type": "Preistyp",
             "Static": "Statisch",
-            "Dynamic": "Dynamisch"
+            "Dynamic": "Dynamisch",
+            "Operating Hours Counter": "Betriebsstundenzähler",
+            "https://www.symcon.de/en/service/documentation/module-reference/operating-hours-counter/": "https://www.symcon.de/de/service/dokumentation/modulreferenz/betriebsstundenzaehler",
+            "OperatingHoursCounter": "Betriebsstundenzaehler"
         }
     }
 }

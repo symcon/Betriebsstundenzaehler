@@ -11,8 +11,8 @@ class BetriebsstundenzaehlerValidationTest extends TestCaseSymconValidation
         $this->validateLibrary(__DIR__ . '/..');
     }
 
-    public function testValidateBetriebsstundenzaehlerModule(): void
+    public function testValidateOperatingHoursCounterModule(): void
     {
-        $this->validateModule(__DIR__ . '/../Betriebsstundenzaehler');
+        $this->validateModule(__DIR__ . '/../OperatingHoursCounter');
     }
 }
