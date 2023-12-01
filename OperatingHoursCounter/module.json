@@ -1,14 +1,14 @@
 {
     "id": "{37569A16-8496-EF9B-A322-FC972D605D90}",
-    "name": "Betriebsstundenzaehler",
+    "name": "OperatingHoursCounter",
     "type": 3,
     "vendor": "",
     "aliases": [
-        "Betriebsstundenzähler"
+        "Operating Hours Counter"
     ],
     "parentRequirements": [],
     "childRequirements": [],
     "implemented": [],
     "prefix": "BSZ",
-    "url": "https://www.symcon.de/de/service/dokumentation/modulreferenz/betriebsstundenzaehler"
+    "url": "https://www.symcon.de/en/service/documentation/module-reference/operating-hours-counter/"
 }

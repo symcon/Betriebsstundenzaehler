@@ -6,7 +6,7 @@
   </php>
   <source>
     <include>
-      <directory suffix=".php">../Betriebsstundenzaehler</directory>
+      <directory suffix=".php">../OperatingHoursCounter</directory>
     </include>
   </source>
 </phpunit>
